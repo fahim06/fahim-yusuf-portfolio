@@ -29,7 +29,7 @@ export default function Navbar() {
       {/* Top Bar */}
       <header className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}>
         <button className="navbar__logo" onClick={() => scrollTo('home')} id="nav-logo">
-          <span className="navbar__logo-text">FY</span>
+          <span className="navbar__logo-text">F.Yusuf</span>
         </button>
 
         <button
