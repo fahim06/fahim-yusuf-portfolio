@@ -140,6 +140,12 @@
   font-size: clamp(64px, 10vw, 130px);
   /* subtle text glow */
   text-shadow: 0 0 60px rgba(255, 255, 255, 0.08);
+  transition: text-shadow 0.4s ease, color 0.4s ease;
+}
+
+.hero__name:hover .hero__name-line {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.3);
+  color: #fff;
 }
 
 /* Space between two lines */
