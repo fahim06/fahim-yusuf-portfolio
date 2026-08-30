@@ -146,7 +146,7 @@ export default async function handler(req, res) {
     try {
       transporter = createTransporter();
     } catch (e) {
-      console.error('[api/send] Missing environment variables.');
+      console.error('[api/send] Missing environment variables:', e.message);
       res.status(500).json({
         ok: false,
         error: 'Email service is temporarily unconfigured. Please contact directly via email.',
