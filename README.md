@@ -1,10 +1,13 @@
 # Fahim Yusuf — Personal Portfolio
 
+[![Live Site](https://img.shields.io/badge/Live-fahimyusuf.com.bd-4ecca3?style=flat&logo=safari&logoColor=white)](https://fahimyusuf.com.bd/)
+[![CI](https://github.com/fahim06/fahim-yusuf-portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/fahim06/fahim-yusuf-portfolio/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/fahim06/fahim-yusuf-portfolio/actions/workflows/security.yml/badge.svg)](https://github.com/fahim06/fahim-yusuf-portfolio/actions/workflows/security.yml)
 [![React](https://img.shields.io/badge/React-19.2-blue?logo=react&logoColor=white)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-8.2-purple?logo=vite&logoColor=white)](https://vite.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A modern, high-performance developer portfolio and personal website for **Fahim Yusuf** — Software Engineer & AI/ML Researcher. Built with React, Vite, and serverless backend functionality for contact management.
+A modern, high-performance developer portfolio and personal website for **Fahim Yusuf** — Software Engineer & AI/ML Researcher. Live at [fahimyusuf.com.bd](https://fahimyusuf.com.bd/). Built with React, Vite, and serverless backend functionality for contact management.
 
 ---
 
@@ -12,12 +15,12 @@ A modern, high-performance developer portfolio and personal website for **Fahim 
 
 - **Visual Design:** Dark-mode editorial aesthetic inspired by modern minimalist creative development.
 - **Interactive Micro-Animations:** Custom lerp cursor, wireframe vector geometry, interactive 3D particle sphere, and animated tab interfaces.
-- **Accessibility & SEO:** 
+- **Accessibility & SEO:**
   - Validated semantic HTML5 structure with ARIA landmark navigation.
   - JSON-LD Structured Data Schema (`WebSite`, `Person`, `CollegeOrUniversity`).
   - Optimized Open Graph & Twitter Card social previews.
   - Support for `prefers-reduced-motion` and keyboard skip-navigation.
-- **Contact Center & Serverless API:** 
+- **Contact Center & Serverless API:**
   - End-to-end contact form with client and server-side validation.
   - Vercel Serverless Function handler (`/api/send`) using Nodemailer over Gmail SMTP.
   - Automated confirmation replies to visitors.
@@ -115,7 +118,7 @@ EMAIL_TO=your.gmail@gmail.com
 ## 💻 Development & Build Scripts
 
 | Command | Description |
-|---|---|
+| --- | --- |
 | `npm run dev` | Starts the Vite development server (frontend only) |
 | `npm run dev:api` | Starts the local backend API server on port 3001 |
 | `npm run dev:full` | Starts both the local API server and Vite concurrently |
@@ -125,17 +128,17 @@ EMAIL_TO=your.gmail@gmail.com
 
 ---
 
-## 🌐 Deployment (Vercel)
+## 🌐 Deployment (Vercel & Custom Domain)
 
-This portfolio is configured for zero-config deployment on **Vercel**:
+This portfolio is configured for continuous deployment on **Vercel** with custom domain [fahimyusuf.com.bd](https://fahimyusuf.com.bd/):
 
-1. Push your repository to GitHub.
-2. Import the project in the [Vercel Dashboard](https://vercel.com).
-3. Add the following **Environment Variables** in Project Settings:
+1. **GitHub Integration:** Every push to `main` triggers automated CI validation, security scans, and production deployment via GitHub Actions (`.github/workflows/deploy.yml`).
+2. **Environment Variables:** Set in Vercel Project Settings and GitHub Secrets:
    - `EMAIL_USER`: Your Gmail address
    - `EMAIL_PASS`: Your Gmail App Password
    - `EMAIL_TO`: Notification destination address
-4. Click **Deploy**. Vercel will automatically compile the frontend and host `/api/send.js` as an edge-ready serverless function.
+3. **Custom Domain:** Assigned to `https://fahimyusuf.com.bd/` with automatic SSL certification and DNS routing.
+4. **Branch Protection:** The `main` branch is protected by strict CI/CD gates (see [.github/BRANCH_PROTECTION.md](.github/BRANCH_PROTECTION.md)).
 
 ---
 
@@ -148,6 +151,7 @@ Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 ## 📬 Contact
 
 **Fahim Yusuf**  
+
 - Email: [fahim.yusuf06@gmail.com](mailto:fahim.yusuf06@gmail.com)  
 - GitHub: [@fahim06](https://github.com/fahim06)  
 - LinkedIn: [in/fahim06](https://www.linkedin.com/in/fahim06/)

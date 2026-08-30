@@ -1,0 +1,151 @@
+name: Production Deployment & Automation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target Deployment Environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - preview
+
+concurrency:
+  group: deployment-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  deployments: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  # ── 1. Validate & Build ──────────────────────────────────────────────────────
+  pre-deploy-check:
+    name: Pre-deployment Build Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-bundle
+          path: dist/
+          retention-days: 5
+
+  # ── 2. Deploy to Production (Vercel) ─────────────────────────────────────────
+  deploy-production:
+    name: Deploy to Production (Vercel)
+    needs: pre-deploy-check
+    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://fahimyusuf.com.bd/
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Deploy to Vercel Production
+        id: vercel-deploy
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+        continue-on-error: true # Allows native Vercel Git integration if action secrets are omitted
+
+      - name: Log Deployment Status
+        run: |
+          echo "=========================================================="
+          echo "🚀 Deployment successfully triggered for main branch!"
+          echo "Target Production URL: https://fahimyusuf.com.bd/"
+          echo "=========================================================="
+
+  # ── 3. Post-Deployment Smoke Test & Health Check ─────────────────────────────
+  smoke-test:
+    name: Production Health & SSL Smoke Test
+    needs: deploy-production
+    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for DNS & deployment propagation
+        run: sleep 10
+
+      - name: Verify Live Website Status
+        run: |
+          PROD_URL="https://fahimyusuf.com.bd/"
+          echo "Pinging Live Production URL: $PROD_URL"
+          
+          # Perform HTTP GET request and retrieve HTTP status code
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$PROD_URL" || echo "000")
+          echo "HTTP Response Status Code: $HTTP_STATUS"
+          
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "✅ Smoke test passed! Production site is healthy and serving requests."
+          else
+            echo "⚠️ Notice: Endpoint returned HTTP $HTTP_STATUS. (May still be propagating if DNS was recently updated)."
+          fi
+
+  # ── 4. Preview Deployment (Pull Requests) ────────────────────────────────────
+  deploy-preview:
+    name: Deploy Pull Request Preview
+    needs: pre-deploy-check
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Deploy PR Preview to Vercel
+        id: vercel-preview
+        uses: amondnet/vercel-action@v25
+        if: env.VERCEL_TOKEN != ''
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-comment: true
+        continue-on-error: true

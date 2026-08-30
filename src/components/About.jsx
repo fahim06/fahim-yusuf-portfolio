@@ -64,10 +64,10 @@ export default function About() {
           <h2 className="about__heading">About</h2>
 
           <blockquote className="about__bio">
-            "Hi, I'm Fahim — an AI/ML researcher and full-stack developer from Bangladesh.
+            "Hi, I'm Fahim an AI/ML researcher and full-stack developer from Bangladesh.
             I hold an M.Sc. in Computer Science from Jahangirnagar University, where I achieved
             99.85% accuracy in citrus classification using deep learning. I have a passion for
-            turning research into intelligent, impactful software — from computer vision systems
+            turning research into intelligent, impactful software from computer vision systems
             to modern web applications. I'm always looking for new challenges and opportunities
             to grow as a developer and make a positive impact with my work."
           </blockquote>

@@ -51,7 +51,9 @@
   transition: color 0.2s;
 }
 
-.footer__nav-link:hover { color: var(--text-primary); }
+.footer__nav-link:hover {
+  color: var(--text-primary);
+}
 
 /* Social Links */
 .footer__social {
@@ -72,7 +74,9 @@
   padding: 4px 0;
 }
 
-.footer__social-link:hover { color: var(--accent); }
+.footer__social-link:hover {
+  color: var(--accent);
+}
 
 /* Bottom row */
 .footer__bottom {
@@ -104,7 +108,9 @@
   text-underline-offset: 3px;
 }
 
-.footer__legal-link:hover { color: var(--text-secondary); }
+.footer__legal-link:hover {
+  color: var(--text-secondary);
+}
 
 /* ── Legal Modals ─────────────────────────────────── */
 .footer-modal {
@@ -121,7 +127,7 @@
 
 .footer-modal__card {
   background: #111111;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 40px;
   max-width: 600px;
   width: 100%;
@@ -129,7 +135,7 @@
   overflow-y: auto;
   position: relative;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
 .footer-modal__close {
@@ -144,7 +150,9 @@
   transition: color 0.2s;
 }
 
-.footer-modal__close:hover { color: var(--text-primary); }
+.footer-modal__close:hover {
+  color: var(--text-primary);
+}
 
 .footer-modal__title {
   font-family: var(--serif);

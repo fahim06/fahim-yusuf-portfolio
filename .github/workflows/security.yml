@@ -1,0 +1,69 @@
+name: Security Analysis & Secret Scanning
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Run weekly security scan on Mondays at 03:00 UTC
+    - cron: '0 3 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+  pull-requests: write
+
+jobs:
+  # ── 1. GitHub CodeQL SAST Analysis ───────────────────────────────────────────
+  codeql:
+    name: CodeQL Static Security Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL for JavaScript / TypeScript
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-extended,security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"
+
+  # ── 2. Secret & Credential Leak Scanning (Gitleaks) ──────────────────────────
+  gitleaks:
+    name: Secret & Credential Leak Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository with full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks secret scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: false
+
+  # ── 3. PR Dependency Security Review ─────────────────────────────────────────
+  dependency-review:
+    name: Dependency Vulnerability Review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Review PR Dependency Changes
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: true

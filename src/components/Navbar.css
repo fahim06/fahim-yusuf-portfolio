@@ -22,7 +22,7 @@
 /* Logo */
 .navbar__logo {
   background: none;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   width: 44px;
   height: 44px;
   border-radius: 4px;
@@ -34,7 +34,7 @@
 }
 
 .navbar__logo:hover {
-  border-color: rgba(255,255,255,0.35);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .navbar__logo-text {
@@ -69,10 +69,12 @@
 .navbar__hamburger--open span:nth-child(1) {
   transform: translateY(6px) rotate(45deg);
 }
+
 .navbar__hamburger--open span:nth-child(2) {
   opacity: 0;
   transform: scaleX(0);
 }
+
 .navbar__hamburger--open span:nth-child(3) {
   transform: translateY(-6px) rotate(-45deg);
 }

@@ -15,13 +15,27 @@ function setCors(res) {
 // ── Input validation ──────────────────────────────────────────────────────────
 function validate({ name, email, message }) {
   const errors = {};
-  if (!name || name.trim().length < 2)
+  const safeName = typeof name === 'string' ? name.trim() : '';
+  const safeEmail = typeof email === 'string' ? email.trim() : '';
+  const safeMessage = typeof message === 'string' ? message.trim() : '';
+
+  if (!safeName || safeName.length < 2)
     errors.name = 'Name must be at least 2 characters.';
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+  if (!safeEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(safeEmail))
     errors.email = 'A valid email address is required.';
-  if (!message || message.trim().length < 10)
+  if (!safeMessage || safeMessage.length < 10)
     errors.message = 'Message must be at least 10 characters.';
   return errors;
+}
+
+// ── HTML escaping ─────────────────────────────────────────────────────────────
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 // ── Nodemailer transporter ────────────────────────────────────────────────────
@@ -31,22 +45,18 @@ function createTransporter() {
   if (!user || !pass) {
     throw new Error('EMAIL_USER and EMAIL_PASS environment variables are required.');
   }
-  return nodemailer.createTransport({ service: 'gmail', auth: { user, pass } });
-}
-
-// ── HTML escaping ─────────────────────────────────────────────────────────────
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return nodemailer.createTransport({ 
+    service: 'gmail', 
+    auth: { user, pass },
+    connectionTimeout: 10000, // 10s timeout
+    greetingTimeout: 10000,
+    socketTimeout: 15000
+  });
 }
 
 // ── Owner notification email ──────────────────────────────────────────────────
 function buildOwnerEmail({ name, email, message }) {
-  const to   = process.env.EMAIL_TO || process.env.EMAIL_USER;
+  const to = process.env.EMAIL_TO || process.env.EMAIL_USER;
   const from = process.env.EMAIL_USER;
   const date = new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
 
@@ -74,15 +84,15 @@ function buildOwnerEmail({ name, email, message }) {
 
 // ── Auto-reply to sender ──────────────────────────────────────────────────────
 function buildAutoReply({ name, email }) {
-  const from      = process.env.EMAIL_USER;
-  const firstName = escapeHtml(name.split(' ')[0]);
+  const from = process.env.EMAIL_USER;
+  const firstName = escapeHtml((name || '').split(' ')[0]);
 
   return {
     from: `"Fahim Yusuf" <${from}>`,
     to: email,
-    subject: `Thanks for reaching out, ${name.split(' ')[0]}!`,
+    subject: `Thanks for reaching out, ${(name || '').split(' ')[0]}!`,
     text: [
-      `Hi ${name.split(' ')[0]},`,
+      `Hi ${(name || '').split(' ')[0]},`,
       '',
       "Thanks for your message! I've received it and will get back to you as soon as possible — typically within 24–48 hours.",
       '',
@@ -96,42 +106,74 @@ function buildAutoReply({ name, email }) {
 
 // ── Request handler ───────────────────────────────────────────────────────────
 export default async function handler(req, res) {
-  setCors(res);
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-
-  if (req.method !== 'POST') {
-    res.status(405).json({ ok: false, error: 'Method not allowed.' });
-    return;
-  }
-
-  const { name, email, message } = req.body || {};
-  const errors = validate({ name, email, message });
-  if (Object.keys(errors).length > 0) {
-    res.status(422).json({ ok: false, errors });
-    return;
-  }
-
   try {
-    const transporter = createTransporter();
+    setCors(res);
+
+    if (req.method === 'OPTIONS') {
+      res.status(200).end();
+      return;
+    }
+
+    if (req.method !== 'POST') {
+      res.status(405).json({ ok: false, error: 'Method not allowed. Use POST.' });
+      return;
+    }
+
+    // Safely parse request body
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch {
+        res.status(400).json({ ok: false, error: 'Malformed JSON payload.' });
+        return;
+      }
+    }
+
+    if (!body || typeof body !== 'object') {
+      res.status(400).json({ ok: false, error: 'Request body is required.' });
+      return;
+    }
+
+    const { name, email, message } = body;
+    const errors = validate({ name, email, message });
+    if (Object.keys(errors).length > 0) {
+      res.status(422).json({ ok: false, errors });
+      return;
+    }
+
+    let transporter;
+    try {
+      transporter = createTransporter();
+    } catch (e) {
+      console.error('[api/send] Missing environment variables.');
+      res.status(500).json({
+        ok: false,
+        error: 'Email service is temporarily unconfigured. Please contact directly via email.',
+      });
+      return;
+    }
+
+
     await Promise.all([
       transporter.sendMail(buildOwnerEmail({ name, email, message })),
       transporter.sendMail(buildAutoReply({ name, email })),
     ]);
+
     res.status(200).json({ ok: true, message: 'Message sent successfully.' });
   } catch (err) {
-    // Log diagnostic info server-side only — never expose credentials or SMTP internals to the client
     if (err.code === 'EAUTH') {
       console.error('[api/send] Gmail authentication failed. Check EMAIL_PASS in environment variables.');
+    } else if (err.code === 'ESOCKET' || err.code === 'ETIMEDOUT') {
+      console.error('[api/send] Network timeout connecting to mail server:', err.code);
     } else {
-      console.error('[api/send] Unexpected error:', err.code ?? 'UNKNOWN');
+      console.error('[api/send] Unexpected error:', err.message || err.code || 'UNKNOWN');
     }
+
     res.status(500).json({
       ok: false,
-      error: 'Failed to send message. Please try again or email directly.',
+      error: 'Failed to send message. Please try again or email directly to fahim.yusuf06@gmail.com.',
     });
   }
 }
+

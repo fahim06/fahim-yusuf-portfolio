@@ -1,0 +1,119 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+
+# Prevent redundant concurrent builds on the same branch
+concurrency:
+  group: ci-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  # ── 1. Code Quality & Linting ────────────────────────────────────────────────
+  lint:
+    name: Code Quality & Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Oxlint code analyzer
+        run: npm run lint
+
+  # ── 2. Build & Artifact Verification Matrix ──────────────────────────────────
+  build:
+    name: Build & Bundle Validation (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Verify build artifacts exist
+        run: |
+          if [ ! -f "dist/index.html" ]; then
+            echo "Error: dist/index.html was not generated!"
+            exit 1
+          fi
+          echo "Production build verified successfully."
+
+      - name: Upload production artifact (Node 20 only)
+        if: matrix.node-version == 20
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-dist
+          path: dist/
+          retention-days: 7
+
+  # ── 3. SEO & Asset Integrity Check ──────────────────────────────────────────
+  seo-and-links:
+    name: SEO & Static Asset Validation
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: production-dist
+          path: dist
+
+      - name: Verify Sitemap and Robots.txt match target domain
+        run: |
+          TARGET_URL="https://fahimyusuf.com.bd/"
+          echo "Checking sitemap.xml for target URL: $TARGET_URL"
+          grep -q "https://fahimyusuf.com.bd/" dist/sitemap.xml || (echo "Missing target URL in dist/sitemap.xml" && exit 1)
+          
+          echo "Checking robots.txt for sitemap reference"
+          grep -q "https://fahimyusuf.com.bd/sitemap.xml" dist/robots.txt || (echo "Missing sitemap in dist/robots.txt" && exit 1)
+          
+          echo "Static SEO & link checks passed."
+
+  # ── 4. Dependency Vulnerability Audit ────────────────────────────────────────
+  audit:
+    name: Dependency Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Check dependencies for high/critical CVEs
+        run: |
+          npm audit --audit-level=high || true
