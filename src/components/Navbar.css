@@ -59,8 +59,12 @@
   flex-direction: column;
   gap: 5px;
   width: 36px;
-  cursor: none;
+  cursor: pointer;
   z-index: 600;
+}
+
+.navbar__hamburger:hover span {
+  box-shadow: 0 0 10px #fff,0 0 20px #fff,0 0 40px #fff,0 0 80px #fff,0 0 120px #fff,0 0 160px #ffffff;
 }
 
 .navbar__hamburger span {
@@ -140,6 +144,7 @@
 
 .nav-overlay__item:hover .nav-overlay__label {
   color: var(--accent);
+  text-shadow: 0 0 10px #fff,0 0 20px #fff,0 0 40px #fff,0 0 80px #fff,0 0 120px #fff,0 0 160px #fff;
 }
 
 .nav-overlay__num {

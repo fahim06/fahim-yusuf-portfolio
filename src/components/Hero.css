@@ -144,7 +144,7 @@
 }
 
 .hero__name:hover .hero__name-line {
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 10px #fff,0 0 20px #fff,0 0 40px #fff,0 0 80px #fff,0 0 120px #fff,0 0 160px #fff;
   color: #fff;
 }
 
@@ -202,6 +202,7 @@
 .hero__cta:hover {
   border-color: rgba(255, 255, 255, 0.5);
   box-shadow: 0 0 30px rgba(255, 255, 255, 0.06);
+  background-color: #121212;
 }
 
 .hero__cta:hover::before {
