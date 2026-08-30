@@ -8,11 +8,11 @@ export const personalInfo = {
   subtitle: "AI/ML Researcher & Full-Stack Developer",
   email: "fahim.yusuf06@gmail.com",
   avatarUrl: "https://avatars.githubusercontent.com/u/68291728?v=4",
-  bio: `Hello! I'm Fahim Yusuf — a Software Engineer with a deep passion for Artificial Intelligence, Machine Learning, and Full-Stack Development. With an M.Sc. in Computer Science & Engineering from Jahangirnagar University, my work sits at the intersection of cutting-edge research and real-world impact.
+  bio: `Hello! I'm Fahim Yusuf a Software Engineer with a deep passion for Artificial Intelligence, Machine Learning, and Full-Stack Development. With an M.Sc. in Computer Science & Engineering from Jahangirnagar University, my work sits at the intersection of cutting-edge research and real-world impact.
 
-I've architected deep learning systems that achieve state-of-the-art accuracy — from 99.85% citrus genus classification using MobileNet & Inception V3, to brain tumor detection at 95.21% accuracy with VGG-16. Beyond research, I build scalable web applications using React, Django, and modern cloud infrastructure.
+I've architected deep learning systems that achieve state-of-the-art accuracy from 99.85% citrus genus classification using MobileNet & Inception V3, to brain tumor detection at 95.21% accuracy with VGG-16. Beyond research, I build scalable web applications using React, Django, and modern cloud infrastructure.
 
-Whether it's training neural networks, designing RESTful APIs, or crafting pixel-perfect UIs, I bring the same level of dedication and curiosity to every challenge. Explore my projects, or reach out — I'm always open to meaningful collaborations.`,
+Whether it's training neural networks, designing RESTful APIs, or crafting pixel-perfect UIs, I bring the same level of dedication and curiosity to every challenge. Explore my projects, or reach out. I'm always open to meaningful collaborations.`,
   location: "Dhaka, Bangladesh",
 };
 
@@ -141,7 +141,7 @@ export const projects = [
   },
   {
     name: "Citrus Classification",
-    description: "Deep learning model for citrus genus identification using MobileNet & Inception V3. Achieved 99.85% classification accuracy — thesis research project.",
+    description: "Deep learning model for citrus genus identification using MobileNet & Inception V3. Achieved 99.85% classification accuracy thesis research project.",
     language: "Jupyter Notebook",
     tags: ["Deep Learning", "CNN", "Transfer Learning", "PyTorch"],
     githubUrl: "https://github.com/fahim06/Citrus_Classification",
@@ -161,7 +161,7 @@ export const projects = [
   },
   {
     name: "NeuroLens",
-    description: "Machine learning application with a GUI interface — my first ML project featuring a desktop visual lens powered by neural networks.",
+    description: "Machine learning application with a GUI interface my first ML project featuring a desktop visual lens powered by neural networks.",
     language: "CSS/Python",
     tags: ["Machine Learning", "GUI", "Python", "OpenCV"],
     githubUrl: "https://github.com/fahim06/NeuroLens",

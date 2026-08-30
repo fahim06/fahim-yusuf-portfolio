@@ -64,7 +64,7 @@ export default function Contact() {
         <div className="contact__divider" />
 
         <p className="contact__intro italic-serif">
-          "Feel free to reach out — let's discuss your next project,
+          "Feel free to reach out, let's discuss your next project,
           collaboration, or just connect."
         </p>
 

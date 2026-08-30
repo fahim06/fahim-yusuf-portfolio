@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://fahimyusuf.dev/sitemap.xml
+Sitemap: https://fahimyusuf.com.bd/sitemap.xml

@@ -2,7 +2,8 @@
 .projects {
   background: var(--bg);
   position: relative;
-  align-items: flex-start; /* override section center-align */
+  align-items: flex-start;
+  /* override section center-align */
 }
 
 /* Background subtle grid */
@@ -11,8 +12,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.013) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.013) 1px, transparent 1px);
   background-size: 60px 60px;
   pointer-events: none;
 }
@@ -40,7 +41,7 @@
   font-size: clamp(40px, 5vw, 64px);
   font-weight: 300;
   letter-spacing: 0.1em;
-  color: rgba(200,200,200,0.6);
+  color: rgba(200, 200, 200, 0.6);
 }
 
 .projects__sub {
@@ -52,7 +53,8 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
-  background: var(--border);  /* gap fills with border color */
+  background: var(--border);
+  /* gap fills with border color */
   border: 1px solid var(--border);
 }
 
@@ -86,12 +88,29 @@
   transition: background 0.3s ease;
 }
 
-.project-card:nth-child(1)::before { background: rgba(99, 102, 241, 0.5); }
-.project-card:nth-child(2)::before { background: rgba(16, 185, 129, 0.5); }
-.project-card:nth-child(3)::before { background: rgba(139, 92, 246, 0.5); }
-.project-card:nth-child(4)::before { background: rgba(6, 182, 212, 0.5); }
-.project-card:nth-child(5)::before { background: rgba(245, 158, 11, 0.5); }
-.project-card:nth-child(6)::before { background: rgba(236, 72, 153, 0.5); }
+.project-card:nth-child(1)::before {
+  background: rgba(99, 102, 241, 0.5);
+}
+
+.project-card:nth-child(2)::before {
+  background: rgba(16, 185, 129, 0.5);
+}
+
+.project-card:nth-child(3)::before {
+  background: rgba(139, 92, 246, 0.5);
+}
+
+.project-card:nth-child(4)::before {
+  background: rgba(6, 182, 212, 0.5);
+}
+
+.project-card:nth-child(5)::before {
+  background: rgba(245, 158, 11, 0.5);
+}
+
+.project-card:nth-child(6)::before {
+  background: rgba(236, 72, 153, 0.5);
+}
 
 /* Wireframe shape — decorative top-right */
 .project-card__shape {
@@ -185,14 +204,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(4px);
   animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .project-detail__card {
@@ -207,8 +231,15 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .project-detail__shape {
@@ -232,9 +263,13 @@
   z-index: 1;
 }
 
-.project-detail__close:hover { color: var(--text-primary); }
+.project-detail__close:hover {
+  color: var(--text-primary);
+}
 
-.project-detail__meta { margin-bottom: 12px; }
+.project-detail__meta {
+  margin-bottom: 12px;
+}
 
 .project-detail__title {
   font-family: var(--serif);
@@ -286,16 +321,33 @@
   text-decoration: none;
 }
 
-.project-detail__link:hover { color: var(--text-primary); border-color: var(--text-primary); }
-.project-detail__link--accent { color: var(--accent); border-color: rgba(78,204,163,0.3); }
-.project-detail__link--accent:hover { border-color: var(--accent); }
+.project-detail__link:hover {
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+.project-detail__link--accent {
+  color: var(--accent);
+  border-color: rgba(78, 204, 163, 0.3);
+}
+
+.project-detail__link--accent:hover {
+  border-color: var(--accent);
+}
 
 /* ── Responsive ────────────────────────────────────── */
 @media (max-width: 900px) {
-  .projects__grid { grid-template-columns: repeat(2, 1fr); }
+  .projects__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 600px) {
-  .projects__grid { grid-template-columns: 1fr; }
-  .project-detail__card { padding: 32px 24px; }
+  .projects__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-detail__card {
+    padding: 32px 24px;
+  }
 }

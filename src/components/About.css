@@ -46,8 +46,13 @@
 }
 
 @keyframes slowRotate {
-  from { transform: rotate3d(0.3, 1, 0.1, 0deg); }
-  to   { transform: rotate3d(0.3, 1, 0.1, 360deg); }
+  from {
+    transform: rotate3d(0.3, 1, 0.1, 0deg);
+  }
+
+  to {
+    transform: rotate3d(0.3, 1, 0.1, 360deg);
+  }
 }
 
 .wireframe-avatar__ring {
@@ -65,14 +70,23 @@
   transform: translate(-50%, -50%);
   width: 80px;
   height: 80px;
-  background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
   border-radius: 50%;
   animation: corePulse 3s ease-in-out infinite;
 }
 
 @keyframes corePulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-  50%       { transform: translate(-50%, -50%) scale(1.4); opacity: 1; }
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.4);
+    opacity: 1;
+  }
 }
 
 .wireframe-avatar__dot {
@@ -84,17 +98,23 @@
   top: 50%;
   left: 50%;
   transform:
-    translate(-50%, -50%)
-    rotate(var(--angle))
-    translateX(var(--radius));
+    translate(-50%, -50%) rotate(var(--angle)) translateX(var(--radius));
   animation: dotOrbit 12s linear infinite;
   animation-delay: calc(var(--angle) / 360deg * -12s);
 }
 
 @keyframes dotOrbit {
-  from { opacity: 0.1; }
-  50%  { opacity: 0.6; }
-  to   { opacity: 0.1; }
+  from {
+    opacity: 0.1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  to {
+    opacity: 0.1;
+  }
 }
 
 /* ── Right – Content ──────────────────────────────── */
@@ -232,10 +252,19 @@
   padding-right: 8px;
 }
 
-.about__skills::-webkit-scrollbar { width: 2px; }
-.about__skills::-webkit-scrollbar-thumb { background: var(--border); }
+.about__skills::-webkit-scrollbar {
+  width: 2px;
+}
 
-.skill-group { display: flex; flex-direction: column; gap: 12px; }
+.about__skills::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+.skill-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
 .skill-group__label {
   font-size: 10px;
@@ -263,7 +292,7 @@
   height: 48px;
   border-radius: 50%;
   border: 1px solid var(--color, #888);
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -271,8 +300,8 @@
 }
 
 .skill-icon:hover .skill-icon__circle {
-  background: rgba(255,255,255,0.08);
-  box-shadow: 0 0 12px rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
 }
 
 .skill-icon__abbr {
@@ -294,6 +323,13 @@
 }
 
 @media (max-width: 900px) {
-  .about__content { padding: 80px 24px; border-left: none; border-top: 1px solid var(--border); }
-  .about__visual { min-height: 50vh; }
+  .about__content {
+    padding: 80px 24px;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .about__visual {
+    min-height: 50vh;
+  }
 }

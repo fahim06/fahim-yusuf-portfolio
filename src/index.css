@@ -6,8 +6,18 @@
 /* Fonts loaded in index.html for performance (single source, display=swap) */
 
 /* ── Reset ────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'Space Grotesk', sans-serif;
   background: #0a0a0a;
@@ -16,9 +26,20 @@ body {
   cursor: none;
 }
 
-a { text-decoration: none; color: inherit; }
-button { font-family: inherit; cursor: none; }
-img { display: block; max-width: 100%; }
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
 
 /* ── Custom Cursor ───────────────────────────────────── */
 .cursor {
@@ -37,40 +58,46 @@ img { display: block; max-width: 100%; }
   transform: translate(-50%, -50%);
   transition: transform 0.1s ease;
   z-index: 9999;
-  pointer-events: none;  /* must not intercept clicks */
+  pointer-events: none;
+  /* must not intercept clicks */
 }
 
 .cursor__ring {
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(255,255,255,0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   position: fixed;
   transform: translate(-50%, -50%);
   transition: all 0.15s ease;
   z-index: 9998;
-  pointer-events: none;  /* must not intercept clicks */
+  pointer-events: none;
+  /* must not intercept clicks */
 }
 
 /* ── CSS Variables ───────────────────────────────────── */
 :root {
-  --bg:            #0a0a0a;
-  --bg-2:          #111111;
-  --bg-3:          #161616;
-  --border:        rgba(255,255,255,0.06);
-  --border-hover:  rgba(255,255,255,0.15);
-  --text-primary:  #e8e8e8;
-  --text-secondary:#a0a0a0;
-  --text-muted:    #888888;   /* was #555 — lightened for WCAG AA contrast */
-  --accent:        #4ecca3;   /* teal green – reference site uses green for buttons */
-  --accent-2:      #ffffff;
-  --serif:         'Cormorant Garamond', Georgia, serif;
-  --sans:          'Space Grotesk', sans-serif;
-  --mono:          'Space Mono', monospace;
+  --bg: #0a0a0a;
+  --bg-2: #111111;
+  --bg-3: #161616;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --text-primary: #e8e8e8;
+  --text-secondary: #a0a0a0;
+  --text-muted: #888888;
+  /* was #555 — lightened for WCAG AA contrast */
+  --accent: #4ecca3;
+  /* teal green – reference site uses green for buttons */
+  --accent-2: #ffffff;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Space Grotesk', sans-serif;
+  --mono: 'Space Mono', monospace;
 }
 
 /* ── Typography ──────────────────────────────────────── */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-family: var(--serif);
   font-weight: 300;
   letter-spacing: 0.08em;
@@ -109,12 +136,24 @@ h1, h2, h3 {
 }
 
 /* ── Scrollbar ───────────────────────────────────────── */
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
 
 /* ── Selection ───────────────────────────────────────── */
-::selection { background: rgba(78, 204, 163, 0.2); color: #fff; }
+::selection {
+  background: rgba(78, 204, 163, 0.2);
+  color: #fff;
+}
 
 /* ── Noise Texture Overlay ───────────────────────────── */
 body::before {
@@ -145,7 +184,7 @@ body::before {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
   cursor: none;
   /* Expand touch target without changing visual size */
@@ -155,7 +194,7 @@ body::before {
 }
 
 .section-dots__dot.active {
-  background: rgba(255,255,255,0.8);
+  background: rgba(255, 255, 255, 0.8);
   transform: scale(1.4);
 }
 
@@ -182,7 +221,9 @@ body::before {
 
 /* ── Responsive ──────────────────────────────────── */
 @media (max-width: 900px) {
-  .container { padding: 0 24px; }
+  .container {
+    padding: 0 24px;
+  }
 }
 
 /* ── Skip Navigation ─────────────────────────────── */
@@ -202,12 +243,16 @@ body::before {
   transition: top 0.2s ease;
   text-decoration: none;
 }
+
 .skip-link:focus {
   top: 16px;
 }
 
 /* ── Focus Visible Rings ─────────────────────────── */
-*:focus { outline: none; }
+*:focus {
+  outline: none;
+}
+
 *:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -216,6 +261,7 @@ body::before {
 
 /* ── Reduced Motion ──────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -224,15 +270,18 @@ body::before {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
   .fade-up,
   .fade-in {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
   }
+
   .hero__canvas {
     display: none !important;
   }
+
   .hero__binary-field {
     display: none !important;
   }

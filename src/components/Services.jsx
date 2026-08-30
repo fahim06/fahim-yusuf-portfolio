@@ -50,7 +50,7 @@ export default function Services() {
 
           <p className="services__intro italic-serif">
             "You might be wondering how I can help you. As a developer, I can turn
-            your ideas into results — using my expertise in AI/ML, full-stack development,
+            your ideas into results using my expertise in AI/ML, full-stack development,
             and data science. Whether it's an intelligent application, a web platform,
             or a research system, I'll create solutions that exceed your expectations."
           </p>

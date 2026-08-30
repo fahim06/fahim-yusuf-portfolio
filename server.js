@@ -11,11 +11,15 @@ const PORT = 3001;
 // ── Input validation ──────────────────────────────────────────────────────────
 function validateBody({ name, email, message }) {
   const errors = {};
-  if (!name || name.trim().length < 2)
+  const safeName = typeof name === 'string' ? name.trim() : '';
+  const safeEmail = typeof email === 'string' ? email.trim() : '';
+  const safeMessage = typeof message === 'string' ? message.trim() : '';
+
+  if (!safeName || safeName.length < 2)
     errors.name = 'Name must be at least 2 characters.';
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+  if (!safeEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(safeEmail))
     errors.email = 'A valid email address is required.';
-  if (!message || message.trim().length < 10)
+  if (!safeMessage || safeMessage.length < 10)
     errors.message = 'Message must be at least 10 characters.';
   return errors;
 }
@@ -51,7 +55,7 @@ async function handleSend(req, res) {
 
     const emailUser = process.env.EMAIL_USER;
     const emailPass = process.env.EMAIL_PASS;
-    const emailTo   = process.env.EMAIL_TO || emailUser;
+    const emailTo = process.env.EMAIL_TO || emailUser;
 
     if (!emailUser || !emailPass) {
       return jsonError(res, 500, {
@@ -65,6 +69,9 @@ async function handleSend(req, res) {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: { user: emailUser, pass: emailPass },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
       });
 
       const timestamp = new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
@@ -113,13 +120,15 @@ async function handleSend(req, res) {
         console.error('[api/send] Gmail authentication failed.');
         console.error('  → Ensure EMAIL_PASS in .env is a valid Gmail App Password.');
         console.error('  → Visit https://myaccount.google.com/apppasswords to generate one.');
+      } else if (err.code === 'ESOCKET' || err.code === 'ETIMEDOUT') {
+        console.error('[api/send] Network timeout connecting to mail server.');
       } else {
-        console.error('[api/send] Unexpected error:', err.code ?? 'UNKNOWN');
+        console.error('[api/send] Unexpected error:', err.message || err.code || 'UNKNOWN');
       }
 
       return jsonError(res, 500, {
         ok: false,
-        error: 'Failed to send message. Please try again or email directly.',
+        error: 'Failed to send message. Please try again or email directly to fahim.yusuf06@gmail.com.',
       });
     }
   });
