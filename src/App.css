@@ -1,0 +1,5 @@
+/* App.css – minimal global overrides */
+main {
+  position: relative;
+  z-index: 2;
+}

@@ -1,0 +1,226 @@
+/* ── Contact Section ───────────────────────────────── */
+.contact {
+  background: var(--bg);
+  justify-content: center;
+}
+
+.contact__inner {
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding-top: 100px;
+  padding-bottom: 100px;
+}
+
+.contact__heading {
+  font-family: var(--serif);
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: rgba(200,200,200,0.6);
+}
+
+.contact__divider {
+  width: 50px;
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+}
+
+.contact__intro {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Form */
+.contact__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contact__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.contact__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contact__label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.contact__input {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  padding: 14px 18px;
+  color: var(--text-primary);
+  font-family: var(--sans);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  width: 100%;
+}
+
+.contact__input::placeholder { color: var(--text-muted); }
+
+.contact__input:focus {
+  border-color: var(--border-hover);
+}
+
+.contact__input--error {
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.contact__field-error {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #f87171;
+  letter-spacing: 0.05em;
+}
+
+.contact__textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+.contact__privacy-note {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-top: -4px;
+}
+
+.contact__submit {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 15px 40px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  cursor: none;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+}
+
+.contact__submit:hover:not(:disabled) {
+  border-color: var(--text-primary);
+  background: rgba(255,255,255,0.04);
+}
+
+.contact__submit--loading,
+.contact__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Success */
+.contact__success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.contact__success-icon {
+  font-size: 32px;
+  color: var(--accent);
+}
+
+/* Error */
+.contact__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  text-align: center;
+}
+
+.contact__error-icon {
+  font-size: 32px;
+  color: #f87171;
+}
+
+.contact__retry {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 10px 28px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.contact__retry:hover {
+  border-color: var(--text-primary);
+  background: rgba(255,255,255,0.04);
+}
+
+.contact__error-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.contact__error-link:hover { opacity: 0.8; }
+
+/* Info */
+.contact__info {
+  display: flex;
+  gap: 40px;
+  border-top: 1px solid var(--border);
+  padding-top: 32px;
+  flex-wrap: wrap;
+}
+
+.contact__info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+
+a.contact__info-item:hover { color: var(--text-primary); }
+
+/* Screen-reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 600px) {
+  .contact__row { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,299 @@
+/* ── About Section ─────────────────────────────────── */
+.about {
+  background: var(--bg);
+  padding: 0;
+}
+
+.about__layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  min-height: 100vh;
+}
+
+@media (max-width: 900px) {
+  .about__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Left – Wireframe Visual ──────────────────────── */
+.about__visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #0e0e0e 100%);
+  overflow: hidden;
+}
+
+/* 3D wireframe sphere (CSS) */
+.wireframe-avatar {
+  position: relative;
+  width: 340px;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wireframe-avatar__sphere {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: slowRotate 20s linear infinite;
+}
+
+@keyframes slowRotate {
+  from { transform: rotate3d(0.3, 1, 0.1, 0deg); }
+  to   { transform: rotate3d(0.3, 1, 0.1, 360deg); }
+}
+
+.wireframe-avatar__ring {
+  position: absolute;
+  inset: calc(var(--i) * 5%);
+  border: 1px solid rgba(200, 200, 200, calc(0.12 - var(--i) * 0.01));
+  border-radius: 50%;
+  transform: rotateX(calc(var(--i) * 22deg)) rotateY(calc(var(--i) * 15deg));
+}
+
+.wireframe-avatar__core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: corePulse 3s ease-in-out infinite;
+}
+
+@keyframes corePulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  50%       { transform: translate(-50%, -50%) scale(1.4); opacity: 1; }
+}
+
+.wireframe-avatar__dot {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--angle))
+    translateX(var(--radius));
+  animation: dotOrbit 12s linear infinite;
+  animation-delay: calc(var(--angle) / 360deg * -12s);
+}
+
+@keyframes dotOrbit {
+  from { opacity: 0.1; }
+  50%  { opacity: 0.6; }
+  to   { opacity: 0.1; }
+}
+
+/* ── Right – Content ──────────────────────────────── */
+.about__content {
+  padding: 100px 60px 80px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 32px;
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  min-height: 100vh;
+}
+
+.about__heading {
+  font-family: var(--serif);
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: rgba(200, 200, 200, 0.6);
+}
+
+.about__bio {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(14px, 1.5vw, 17px);
+  line-height: 1.9;
+  color: var(--text-secondary);
+  text-align: center;
+  position: relative;
+  padding: 0 8px;
+}
+
+/* Tabs */
+.about__tabs {
+  display: flex;
+  gap: 32px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+
+.about__tab {
+  background: none;
+  border: none;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding-bottom: 12px;
+  cursor: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.3s, border-color 0.3s;
+  letter-spacing: 0.05em;
+  margin-bottom: -1px;
+}
+
+.about__tab--active {
+  color: var(--text-primary);
+  border-bottom-color: var(--text-primary);
+}
+
+/* ── Education ─────────────────────────────────────── */
+.about__education {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.edu-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.edu-row:last-of-type {
+  border-bottom: none;
+}
+
+.edu-row__year {
+  min-width: 80px;
+  font-size: 10px;
+  color: var(--text-muted);
+  padding-top: 3px;
+}
+
+.edu-row__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.edu-row__institution {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.edu-row__degree {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* CV Button */
+.about__cv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+  padding: 14px 36px;
+  border: 1px solid rgba(78, 204, 163, 0.4);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+}
+
+.about__cv-btn:hover {
+  background: rgba(78, 204, 163, 0.08);
+  border-color: var(--accent);
+}
+
+/* ── Skills ─────────────────────────────────────────── */
+.about__skills {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+  max-height: 340px;
+  padding-right: 8px;
+}
+
+.about__skills::-webkit-scrollbar { width: 2px; }
+.about__skills::-webkit-scrollbar-thumb { background: var(--border); }
+
+.skill-group { display: flex; flex-direction: column; gap: 12px; }
+
+.skill-group__label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.skill-group__icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.skill-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
+}
+
+.skill-icon__circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--color, #888);
+  background: rgba(255,255,255,0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.skill-icon:hover .skill-icon__circle {
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 0 12px rgba(255,255,255,0.05);
+}
+
+.skill-icon__abbr {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color, #888);
+}
+
+.skill-icon__name {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 48px;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .about__content { padding: 80px 24px; border-left: none; border-top: 1px solid var(--border); }
+  .about__visual { min-height: 50vh; }
+}

@@ -1,0 +1,239 @@
+/* ============================================================
+   GLOBAL DESIGN SYSTEM — Dark Cinematic Theme
+   Inspired by gustavobatista.dev
+   ============================================================ */
+
+/* Fonts loaded in index.html for performance (single source, display=swap) */
+
+/* ── Reset ────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: #0a0a0a;
+  color: #c8c8c8;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: none; }
+img { display: block; max-width: 100%; }
+
+/* ── Custom Cursor ───────────────────────────────────── */
+.cursor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+}
+
+.cursor__dot {
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease;
+  z-index: 9999;
+  pointer-events: none;  /* must not intercept clicks */
+}
+
+.cursor__ring {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 50%;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  transition: all 0.15s ease;
+  z-index: 9998;
+  pointer-events: none;  /* must not intercept clicks */
+}
+
+/* ── CSS Variables ───────────────────────────────────── */
+:root {
+  --bg:            #0a0a0a;
+  --bg-2:          #111111;
+  --bg-3:          #161616;
+  --border:        rgba(255,255,255,0.06);
+  --border-hover:  rgba(255,255,255,0.15);
+  --text-primary:  #e8e8e8;
+  --text-secondary:#a0a0a0;
+  --text-muted:    #888888;   /* was #555 — lightened for WCAG AA contrast */
+  --accent:        #4ecca3;   /* teal green – reference site uses green for buttons */
+  --accent-2:      #ffffff;
+  --serif:         'Cormorant Garamond', Georgia, serif;
+  --sans:          'Space Grotesk', sans-serif;
+  --mono:          'Space Mono', monospace;
+}
+
+/* ── Typography ──────────────────────────────────────── */
+h1, h2, h3 {
+  font-family: var(--serif);
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+}
+
+/* ── Section Base ────────────────────────────────────── */
+.section {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 60px;
+}
+
+/* ── Utility ─────────────────────────────────────────── */
+.letter-spaced {
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--text-secondary);
+}
+
+.italic-serif {
+  font-family: var(--serif);
+  font-style: italic;
+}
+
+/* ── Scrollbar ───────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* ── Selection ───────────────────────────────────────── */
+::selection { background: rgba(78, 204, 163, 0.2); color: #fff; }
+
+/* ── Noise Texture Overlay ───────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.4;
+}
+
+/* ── Section Dot Navigation (right side) ─────────────── */
+.section-dots {
+  position: fixed;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
+}
+
+.section-dots__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.3s ease;
+  cursor: none;
+  /* Expand touch target without changing visual size */
+  padding: 10px;
+  margin: -10px;
+  box-sizing: content-box;
+}
+
+.section-dots__dot.active {
+  background: rgba(255,255,255,0.8);
+  transform: scale(1.4);
+}
+
+/* ── Animate In ──────────────────────────────────────── */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-in {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 900px) {
+  .container { padding: 0 24px; }
+}
+
+/* ── Skip Navigation ─────────────────────────────── */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  background: var(--accent);
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 99999;
+  transition: top 0.2s ease;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 16px;
+}
+
+/* ── Focus Visible Rings ─────────────────────────── */
+*:focus { outline: none; }
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ── Reduced Motion ──────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .fade-up,
+  .fade-in {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .hero__canvas {
+    display: none !important;
+  }
+  .hero__binary-field {
+    display: none !important;
+  }
+}

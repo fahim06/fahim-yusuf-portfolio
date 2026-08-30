@@ -1,0 +1,44 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+
+# Build output
+dist
+dist-ssr
+
+# ── Environment & Secrets ─────────────────────────────
+# NEVER commit real credentials. Use .env.example as a template.
+.env
+.env.local
+.env.*.local
+.env.production
+.env.production.local
+
+# ── Vercel ────────────────────────────────────────────
+.vercel
+
+# ── Editor ────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── OS ────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Misc ──────────────────────────────────────────────
+*.local
+coverage
