@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
@@ -41,7 +41,7 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        node-version: [20, 22]
+        node-version: [22, 24]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -67,7 +67,7 @@ jobs:
           echo "Production build verified successfully."
 
       - name: Upload production artifact (Node 20 only)
-        if: matrix.node-version == 20
+        if: matrix.node-version == 22
         uses: actions/upload-artifact@v4
         with:
           name: production-dist
@@ -111,7 +111,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Check dependencies for high/critical CVEs
