@@ -55,7 +55,6 @@ export default function Navbar() {
               id={`nav-link-${item.id}`}
               style={{ transitionDelay: open ? `${i * 0.07}s` : '0s' }}
             >
-              <span className="nav-overlay__num">0{i + 1}</span>
               <span className="nav-overlay__label">{item.label}</span>
             </button>
           ))}
