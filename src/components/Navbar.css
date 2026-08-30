@@ -162,11 +162,19 @@
 
 .nav-overlay__footer {
   position: absolute;
-  bottom: 40px;
+  bottom: 10vh;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(20px);
   display: flex;
-  gap: 24px;
+  gap: 32px;
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition-delay: 0.4s;
+}
+
+.nav-overlay--open .nav-overlay__footer {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .nav-overlay__footer a {
@@ -175,7 +183,12 @@
   display: flex;
 }
 
+.nav-overlay__footer a svg {
+  width: 32px;
+  height: 32px;
+}
+
 .nav-overlay__footer a:hover {
   color: var(--accent);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
