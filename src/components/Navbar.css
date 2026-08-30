@@ -64,7 +64,7 @@
 }
 
 .navbar__hamburger:hover span {
-  box-shadow: 0 0 10px #fff,0 0 20px #fff,0 0 40px #fff,0 0 80px #fff,0 0 120px #fff,0 0 160px #ffffff;
+  box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #fff, 0 0 80px #fff, 0 0 120px #fff, 0 0 160px #ffffff;
 }
 
 .navbar__hamburger span {
@@ -94,7 +94,7 @@
   position: fixed;
   inset: 0;
   z-index: 400;
-  background: rgba(8, 8, 8, 0.7);
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -102,7 +102,18 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s ease;
-  backdrop-filter: blur(10px);
+}
+
+.nav-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.4;
 }
 
 .nav-overlay--open {
@@ -144,7 +155,7 @@
 
 .nav-overlay__item:hover .nav-overlay__label {
   color: var(--accent);
-  text-shadow: 0 0 10px #fff,0 0 20px #fff,0 0 40px #fff,0 0 80px #fff,0 0 120px #fff,0 0 160px #fff;
+  text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #fff, 0 0 80px #fff, 0 0 120px #fff, 0 0 160px #fff;
 }
 
 .nav-overlay__num {
