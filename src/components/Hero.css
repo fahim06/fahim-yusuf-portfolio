@@ -159,7 +159,7 @@
 }
 
 .hero__name-first {
-  color: #fff;
+  color: #ffffff;
   margin-right: -1.6vw;
   font-weight: 700;
   font-size: 1.4em;
@@ -167,6 +167,7 @@
 }
 
 .hero__name-rest {
+  color: #a8a8a8;
   margin-right: 2vw;
   font-weight: 400;
   font-size: 1.1em;
