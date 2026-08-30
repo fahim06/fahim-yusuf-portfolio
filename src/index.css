@@ -176,15 +176,16 @@ body::before {
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: min(1.5%, 35px);
   z-index: 100;
 }
 
 .section-dots__dot {
-  width: 5px;
-  height: 5px;
+  width: 0.5vw;
+  height: 0.5vw;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background-color: #a8a8a8;
+  background-clip: content-box;
   transition: all 0.3s ease;
   cursor: none;
   /* Expand touch target without changing visual size */
@@ -194,7 +195,7 @@ body::before {
 }
 
 .section-dots__dot.active {
-  background: rgba(255, 255, 255, 0.8);
+  background-color: #cecece;
   transform: scale(1.4);
 }
 

@@ -175,8 +175,14 @@ export default function Hero() {
         <p className="hero__eyebrow letter-spaced">| Creative Developer |</p>
 
         <h1 className="hero__name">
-          <span className="hero__name-line">Fahim</span>
-          <span className="hero__name-line">Yusuf</span>
+          <span className="hero__name-line">
+            <span className="hero__name-first">F</span>
+            <span className="hero__name-rest">AHIM</span>
+          </span>
+          <span className="hero__name-line">
+            <span className="hero__name-first">Y</span>
+            <span className="hero__name-rest">USUF</span>
+          </span>
         </h1>
 
         <button className="hero__cta" onClick={scrollToContact} id="hero-cta-btn">

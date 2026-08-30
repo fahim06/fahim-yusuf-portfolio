@@ -20,11 +20,17 @@
 }
 
 .footer__logo {
-  font-family: var(--mono);
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-family: 'Comforter Brush', cursive;
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: 0;
   color: var(--text-primary);
+  transition: text-shadow 0.3s ease, color 0.3s ease;
+}
+
+.footer__logo:hover {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5);
+  color: #fff;
 }
 
 .footer__tagline {

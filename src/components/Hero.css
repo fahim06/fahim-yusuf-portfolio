@@ -140,6 +140,12 @@
   font-size: clamp(64px, 10vw, 130px);
   /* subtle text glow */
   text-shadow: 0 0 60px rgba(255, 255, 255, 0.08);
+  transition: text-shadow 0.4s ease, color 0.4s ease;
+}
+
+.hero__name:hover .hero__name-line {
+  text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #fff, 0 0 80px #fff, 0 0 120px #fff, 0 0 160px #fff;
+  color: #fff;
 }
 
 /* Space between two lines */
@@ -150,6 +156,22 @@
 
 .hero__name-line:last-child {
   align-self: flex-end;
+}
+
+.hero__name-first {
+  color: #ffffff;
+  margin-right: -1.6vw;
+  font-weight: 700;
+  font-size: 1.4em;
+  font-family: 'Nanum Myeongjo', serif;
+}
+
+.hero__name-rest {
+  color: #a8a8a8;
+  margin-right: 2vw;
+  font-weight: 400;
+  font-size: 1.1em;
+  font-family: 'Nanum Myeongjo', serif;
 }
 
 /* CTA Button */
@@ -180,6 +202,7 @@
 .hero__cta:hover {
   border-color: rgba(255, 255, 255, 0.5);
   box-shadow: 0 0 30px rgba(255, 255, 255, 0.06);
+  background-color: #121212;
 }
 
 .hero__cta:hover::before {
