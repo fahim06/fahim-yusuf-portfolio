@@ -158,6 +158,21 @@
   align-self: flex-end;
 }
 
+.hero__name-first {
+  color: #fff;
+  margin-right: -1.6vw;
+  font-weight: 700;
+  font-size: 1.4em;
+  font-family: 'Nanum Myeongjo', serif;
+}
+
+.hero__name-rest {
+  margin-right: 2vw;
+  font-weight: 400;
+  font-size: 1.1em;
+  font-family: 'Nanum Myeongjo', serif;
+}
+
 /* CTA Button */
 .hero__cta {
   background: transparent;
