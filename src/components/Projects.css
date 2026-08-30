@@ -324,6 +324,7 @@
 .project-detail__link:hover {
   color: var(--text-primary);
   border-color: var(--text-primary);
+  background: #131313;
 }
 
 .project-detail__link--accent {

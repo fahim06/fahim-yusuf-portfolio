@@ -73,6 +73,7 @@
 .service-card:hover {
   border-color: var(--border-hover);
   background: rgba(255, 255, 255, 0.02);
+  transform: translateY(-1px);
 }
 
 .service-card__icon {

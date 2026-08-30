@@ -123,7 +123,7 @@
 
 .contact__submit:hover:not(:disabled) {
   border-color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.04);
+  background-color: #444;
 }
 
 .contact__submit--loading,

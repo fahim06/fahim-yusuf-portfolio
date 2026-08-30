@@ -10,7 +10,7 @@ export default function Footer() {
       <footer className="footer">
         <div className="footer__inner container">
           <div className="footer__brand">
-            <span className="footer__logo">FY</span>
+            <span className="footer__logo">F.Yusuf</span>
             <span className="footer__tagline letter-spaced">
               Fahim Yusuf · Software Engineer
             </span>
