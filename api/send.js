@@ -4,6 +4,7 @@
 // Environment variables required: EMAIL_USER, EMAIL_PASS, EMAIL_TO (optional).
 
 import nodemailer from 'nodemailer';
+import { metric } from '@vercel/functions';
 
 // ── CORS headers ──────────────────────────────────────────────────────────────
 function setCors(res) {
@@ -155,10 +156,14 @@ export default async function handler(req, res) {
     }
 
 
+    const start = Date.now();
     await Promise.all([
       transporter.sendMail(buildOwnerEmail({ name, email, message })),
       transporter.sendMail(buildAutoReply({ name, email })),
     ]);
+    const duration = Date.now() - start;
+    metric('email.send_duration_ms', duration, { service: 'gmail', status: 'success' });
+    metric('contact.submission', 1);
 
     res.status(200).json({ ok: true, message: 'Message sent successfully.' });
   } catch (err) {
