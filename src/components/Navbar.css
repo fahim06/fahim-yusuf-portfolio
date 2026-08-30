@@ -37,12 +37,18 @@
   border-color: rgba(255, 255, 255, 0.35);
 }
 
+.navbar__logo:hover .navbar__logo-text {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
 .navbar__logo-text {
   font-family: 'Comforter Brush', cursive;
   font-size: 24px;
   font-weight: 400;
   letter-spacing: 0;
   color: var(--text-primary);
+  transition: text-shadow 0.3s ease, color 0.3s ease;
 }
 
 /* Hamburger */
