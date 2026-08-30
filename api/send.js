@@ -45,8 +45,8 @@ function createTransporter() {
   if (!user || !pass) {
     throw new Error('EMAIL_USER and EMAIL_PASS environment variables are required.');
   }
-  return nodemailer.createTransport({ 
-    service: 'gmail', 
+  return nodemailer.createTransport({
+    service: 'gmail',
     auth: { user, pass },
     connectionTimeout: 10000, // 10s timeout
     greetingTimeout: 10000,

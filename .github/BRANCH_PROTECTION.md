@@ -27,11 +27,8 @@ To enforce quality, security, and prevent accidental direct commits to `main`, c
   - Require review from Code Owners: `Optional`
 - ✅ **Require status checks to pass before merging:**
   - Search and check the following status checks:
-    - `Code Quality & Linting`
-    - `Build & Bundle Validation (Node 20)`
-    - `SEO & Static Asset Validation`
-    - `CodeQL Static Security Analysis`
-    - `Secret & Credential Leak Detection`
+    - `enforce-dev-to-main`
+    - `pre-deploy-check`
   - Require branches to be up to date before merging: `Enabled`
 - ✅ **Do not allow bypassing the above settings:** Includes repository administrators in the rules.
 
@@ -45,7 +42,7 @@ If you prefer classic Branch Protection:
 2. **Branch name pattern:** `main`
 3. Check the following:
    - [x] **Require a pull request before merging**
-   - [x] **Require status checks to pass before merging** (Select `lint`, `build`, `codeql`, `gitleaks`)
+   - [x] **Require status checks to pass before merging** (Select `enforce-dev-to-main`, `pre-deploy-check`)
    - [x] **Require branches to be up to date before merging**
    - [x] **Require linear history**
    - [x] **Do not allow bypassing the above settings**

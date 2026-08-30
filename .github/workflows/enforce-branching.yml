@@ -1,0 +1,19 @@
+name: Enforce Branching Strategy
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  enforce-dev-to-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch
+        run: |
+          if [ "${{ github.head_ref }}" != "dev" ]; then
+            echo "Error: Pull requests targeting the 'main' branch MUST originate from the 'dev' branch."
+            echo "You are attempting to merge from '${{ github.head_ref }}'."
+            exit 1
+          fi
+          echo "Branch check passed! Source branch is dev."
