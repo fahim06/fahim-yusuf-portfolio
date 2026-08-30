@@ -1,8 +1,7 @@
 # Fahim Yusuf — Personal Portfolio
 
 [![Live Site](https://img.shields.io/badge/Live-fahimyusuf.com.bd-4ecca3?style=flat&logo=safari&logoColor=white)](https://fahimyusuf.com.bd/)
-[![CI](https://github.com/fahim06/fahim-yusuf-portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/fahim06/fahim-yusuf-portfolio/actions/workflows/ci.yml)
-[![Security Scan](https://github.com/fahim06/fahim-yusuf-portfolio/actions/workflows/security.yml/badge.svg)](https://github.com/fahim06/fahim-yusuf-portfolio/actions/workflows/security.yml)
+[![CI/CD Pipeline](https://github.com/fahim06/fahim-yusuf-portfolio/actions/workflows/CI-CD.yml/badge.svg)](https://github.com/fahim06/fahim-yusuf-portfolio/actions/workflows/CI-CD.yml)
 [![React](https://img.shields.io/badge/React-19.2-blue?logo=react&logoColor=white)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-8.2-purple?logo=vite&logoColor=white)](https://vite.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -132,7 +131,7 @@ EMAIL_TO=your.gmail@gmail.com
 
 This portfolio is configured for continuous deployment on **Vercel** with custom domain [fahimyusuf.com.bd](https://fahimyusuf.com.bd/):
 
-1. **GitHub Integration:** Every push to `main` triggers automated CI validation, security scans, and production deployment via GitHub Actions (`.github/workflows/deploy.yml`).
+1. **GitHub Integration:** Every push to `main` triggers automated CI validation, security scans, and production deployment via GitHub Actions (`.github/workflows/CI-CD.yml`).
 2. **Environment Variables:** Set in Vercel Project Settings and GitHub Secrets:
    - `EMAIL_USER`: Your Gmail address
    - `EMAIL_PASS`: Your Gmail App Password
