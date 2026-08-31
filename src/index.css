@@ -20,7 +20,7 @@ html {
 
 body {
   font-family: 'Space Grotesk', sans-serif;
-  background: #0a0a0a;
+  background: transparent;
   color: #c8c8c8;
   overflow-x: hidden;
   cursor: none;

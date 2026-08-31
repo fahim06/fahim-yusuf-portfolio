@@ -164,7 +164,7 @@ export default function Hero() {
 
   return (
     <section id="home" className="hero section">
-      <ParticleCanvas />
+
       <BinaryFloats />
       <WaveShape />
 
