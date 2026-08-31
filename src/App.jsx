@@ -4,7 +4,8 @@ import { Analytics } from '@vercel/analytics/react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
-import Services from './components/Services';
+import Experience from './components/Experience';
+import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -13,7 +14,7 @@ import './App.css';
 
 
 /* ── Section Dots Navigation ───────────────────────── */
-const SECTIONS = ['home', 'about', 'services', 'projects', 'contact'];
+const SECTIONS = ['home', 'about', 'projects', 'experience', 'skills', 'contact'];
 
 function SectionDots() {
   const [active, setActive] = useState('home');
@@ -66,8 +67,9 @@ export default function App() {
       <main id="main-content">
         <Hero />
         <About />
-        <Services />
         <Projects />
+        <Experience />
+        <Skills />
         <Contact />
       </main>
       <Footer />
