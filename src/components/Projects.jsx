@@ -1,6 +1,13 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { projects } from '../data/portfolio';
 import { useIntersection } from '../hooks/useIntersection';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCoverflow, Pagination } from 'swiper/modules';
+
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/pagination';
 import './Projects.css';
 
 /* Wireframe polygon shape — now used as card accent */
@@ -25,7 +32,7 @@ export default function Projects() {
   const [activeProject, setActiveProject] = useState(null);
   const [ref, visible] = useIntersection();
 
-  const displayed = (projects || []).slice(0, 6);
+  const displayed = (projects || []);
 
   return (
     <section id="projects" className="projects section">
@@ -39,51 +46,77 @@ export default function Projects() {
           <p className="projects__sub letter-spaced">Selected works</p>
         </div>
 
-        {/* Project cards grid */}
-        <div className="projects__grid" role="list">
+        {/* Project cards swiper */}
+        <Swiper
+          effect={'coverflow'}
+          grabCursor={true}
+          centeredSlides={true}
+          slidesPerView={'auto'}
+          loop={true}
+          coverflowEffect={{
+            rotate: 50,
+            stretch: 0,
+            depth: 200,
+            modifier: 1.5,
+            slideShadows: true,
+          }}
+          pagination={{ clickable: true }}
+          modules={[EffectCoverflow, Pagination]}
+          className="projects__swiper"
+          style={{ width: '100%', padding: '40px 0 60px 0' }}
+        >
           {displayed.map((project, i) => (
-            <article
-              key={project.name}
-              className="project-card"
-              role="listitem"
-              id={`project-card-${i}`}
-              onClick={() => setActiveProject(project)}
-              onKeyDown={(e) => e.key === 'Enter' && setActiveProject(project)}
-              tabIndex={0}
-              aria-label={`${project.name} — click to view details`}
-            >
-              {/* Accent shape top-right */}
-              <div className="project-card__shape" aria-hidden="true">
-                <WireframeShape type={i} />
-              </div>
-
-              {/* Card content */}
-              <div className="project-card__body">
-                <span
-                  className="project-card__lang letter-spaced"
-                  style={{ color: project.color || 'var(--accent)' }}
-                >
-                  {project.language}
-                </span>
-                <h3 className="project-card__title">{project.name}</h3>
-                <p className="project-card__desc">{project.description}</p>
-                <div className="project-card__tags">
-                  {(project.tags || []).slice(0, 3).map((t) => (
-                    <span key={t} className="project-card__tag">{t}</span>
-                  ))}
+            <SwiperSlide key={`${project.name}-${i}`} style={{ width: 'min(90vw, 420px)', height: 'auto', alignSelf: 'stretch' }}>
+              <article
+                className="project-card"
+                role="listitem"
+                id={`project-card-${i}`}
+                onClick={() => setActiveProject(project)}
+                onKeyDown={(e) => e.key === 'Enter' && setActiveProject(project)}
+                tabIndex={0}
+                aria-label={`${project.name} — click to view details`}
+                style={{ height: '100%' }}
+              >
+                {/* Accent shape top-right */}
+                <div className="project-card__shape" aria-hidden="true">
+                  <WireframeShape type={i} />
                 </div>
-              </div>
 
-              <div className="project-card__cta" aria-hidden="true">
-                View details →
-              </div>
-            </article>
+                {/* Card content */}
+                <div className="project-card__body">
+                  <div className="project-card__meta">
+                    <span
+                      className="project-card__lang letter-spaced"
+                      style={{ color: project.color || 'var(--accent)' }}
+                    >
+                      {project.language}
+                    </span>
+                    {project.badge && (
+                      <span className="project-card__badge" style={{ backgroundColor: `${project.color}20`, color: project.color, border: `1px solid ${project.color}50` }}>
+                        {project.badge}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="project-card__title">{project.name}</h3>
+                  <p className="project-card__desc">{project.description}</p>
+                  <div className="project-card__tags">
+                    {(project.tags || []).slice(0, 3).map((t) => (
+                      <span key={t} className="project-card__tag">{t}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="project-card__cta" aria-hidden="true">
+                  View details →
+                </div>
+              </article>
+            </SwiperSlide>
           ))}
-        </div>
+        </Swiper>
       </div>
 
       {/* Project detail modal */}
-      {activeProject && (
+      {activeProject && createPortal(
         <div
           className="project-detail"
           onClick={() => setActiveProject(null)}
@@ -151,7 +184,8 @@ export default function Projects() {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

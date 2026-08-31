@@ -178,27 +178,36 @@ body::before {
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: min(1.5%, 35px);
+  gap: 45px;
   z-index: 100;
 }
 
 .section-dots__dot {
-  width: 0.5vw;
-  height: 0.5vw;
-  border-radius: 50%;
-  background-color: #a8a8a8;
-  background-clip: content-box;
-  transition: all 0.3s ease;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
   cursor: none;
-  /* Expand touch target without changing visual size */
-  padding: 10px;
-  margin: -10px;
-  box-sizing: content-box;
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
 }
 
-.section-dots__dot.active {
-  background-color: #cecece;
-  transform: scale(1.4);
+.section-dots__dot::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.section-dots__dot.active::after {
+  background-color: rgba(255, 255, 255, 0.85);
+  transform: scale(1.2);
 }
 
 /* ── Animate In ──────────────────────────────────────── */
