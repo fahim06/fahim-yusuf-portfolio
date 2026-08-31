@@ -42,3 +42,6 @@ Thumbs.db
 # ── Misc ──────────────────────────────────────────────
 *.local
 coverage
+
+
+.github/workflows/CI-CD_previous.yml
