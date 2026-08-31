@@ -19,7 +19,8 @@ function ParticleCanvas() {
     const rand = (min, max) => Math.random() * (max - min) + min;
 
     const initParticles = () => {
-      particles = Array.from({ length: 120 }, () => ({
+      const particleCount = window.innerWidth < 768 ? 40 : 100;
+      particles = Array.from({ length: particleCount }, () => ({
         x: rand(0, W),
         y: rand(0, H),
         vx: rand(-0.15, 0.15),

@@ -26,6 +26,7 @@
   border-radius: 50%;
   z-index: 1;
   animation: glowPulse 4s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 @keyframes glowPulse {
@@ -57,6 +58,7 @@
   color: rgba(255, 255, 255, 0.07);
   animation: binaryFloat linear infinite;
   white-space: nowrap;
+  will-change: transform, opacity;
 }
 
 @keyframes binaryFloat {
@@ -88,6 +90,7 @@
   height: 200px;
   z-index: 1;
   animation: waveDrift 6s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 .hero__wave svg {
