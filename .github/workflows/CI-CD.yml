@@ -35,7 +35,7 @@ jobs:
   # GitHub renders this as a compact matrix group with five checks.
   # ═══════════════════════════════════════════════════════════════════════════════
   quality-security:
-    name: ① Quality & Security • ${{ matrix.label }}
+    name: ① Quality & Security • 
     runs-on: ubuntu-latest
     permissions:
       contents: read
