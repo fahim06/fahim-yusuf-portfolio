@@ -48,14 +48,34 @@
   color: var(--text-muted);
 }
 
-/* ── Cards Grid ────────────────────────────────────── */
-.projects__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--border);
-  /* gap fills with border color */
-  border: 1px solid var(--border);
+/* ── Cards Swiper ────────────────────────────────────── */
+.projects__swiper {
+  width: 100%;
+  padding-bottom: 60px !important;
+  overflow: visible !important;
+}
+
+.swiper-slide {
+  background-color: transparent;
+  transition: opacity 0.3s ease;
+  opacity: 0.3;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.swiper-slide-active {
+  opacity: 1;
+}
+
+.swiper-pagination-bullet {
+  background-color: var(--text-muted) !important;
+  opacity: 0.3 !important;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: var(--text-primary) !important;
+  opacity: 1 !important;
+  transform: scale(1.2);
 }
 
 /* ── Project Card ──────────────────────────────────── */
@@ -67,9 +87,14 @@
   flex-direction: column;
   gap: 0;
   overflow: hidden;
-  cursor: none;
+  cursor: grab;
   transition: background 0.3s ease;
-  min-height: 240px;
+  min-height: 380px;
+  border: 1px solid var(--border);
+}
+
+.project-card:active {
+  cursor: grabbing;
 }
 
 .project-card:hover {
@@ -135,8 +160,24 @@
   flex: 1;
 }
 
+.project-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .project-card__lang {
   font-size: 10px;
+}
+
+.project-card__badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
 }
 
 .project-card__title {
@@ -155,7 +196,7 @@
   color: var(--text-secondary);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 6;
   overflow: hidden;
 }
 
@@ -337,17 +378,7 @@
 }
 
 /* ── Responsive ────────────────────────────────────── */
-@media (max-width: 900px) {
-  .projects__grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 600px) {
-  .projects__grid {
-    grid-template-columns: 1fr;
-  }
-
   .project-detail__card {
     padding: 32px 24px;
   }
