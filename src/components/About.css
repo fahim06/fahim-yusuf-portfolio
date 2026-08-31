@@ -1,6 +1,6 @@
 /* ── About Section ─────────────────────────────────── */
 .about {
-  background: var(--bg);
+  background: transparent;
   padding: 0;
 }
 
@@ -24,7 +24,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a 0%, #0e0e0e 100%);
+  background: transparent;
   overflow: hidden;
 }
 
@@ -127,8 +127,7 @@
   flex-direction: column;
   justify-content: center;
   gap: 32px;
-  background: var(--bg);
-  border-left: 1px solid var(--border);
+  background: transparent;
   min-height: 100vh;
 }
 
@@ -223,113 +222,127 @@
 }
 
 /* CV Button */
+.about__actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .about__cv-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-top: 16px;
-  padding: 14px 36px;
-  border: 1px solid rgba(78, 204, 163, 0.4);
-  border-radius: 4px;
+  background: linear-gradient(145deg, rgba(176, 38, 255, 0.1), rgba(0, 0, 0, 0.5));
+  border: 1px solid rgba(176, 38, 255, 0.3);
+  border-radius: 999px;
+  padding: 15px 40px;
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 0.2em;
-  color: var(--accent);
+  color: var(--text-primary);
   text-transform: uppercase;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   align-self: flex-start;
+  box-shadow:
+    0 4px 12px rgba(176, 38, 255, 0.1),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.1);
+  text-decoration: none;
 }
 
 .about__cv-btn:hover {
-  background: rgba(78, 204, 163, 0.08);
   border-color: var(--accent);
+  background: linear-gradient(145deg, rgba(176, 38, 255, 0.2), rgba(176, 38, 255, 0.05));
+  box-shadow:
+    0 0 20px rgba(176, 38, 255, 0.3),
+    inset 1px 1px 4px rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  color: var(--accent);
 }
 
 /* ── Skills ─────────────────────────────────────────── */
-.about__skills {
+.about__skills-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  overflow-y: auto;
-  max-height: 340px;
-  padding-right: 8px;
+  gap: 32px;
 }
 
-.about__skills::-webkit-scrollbar {
-  width: 2px;
-}
-
-.about__skills::-webkit-scrollbar-thumb {
-  background: var(--border);
+.about__skills-columns {
+  display: flex;
+  gap: 40px;
+  justify-content: space-between;
 }
 
 .skill-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  flex: 1;
 }
 
 .skill-group__label {
-  font-size: 10px;
-  letter-spacing: 0.2em;
+  font-size: 12px;
+  letter-spacing: 0.15em;
   color: var(--text-muted);
   text-transform: uppercase;
+  text-align: center;
+  font-weight: 500;
+  margin-bottom: 8px;
 }
 
 .skill-group__icons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px 16px;
+  justify-items: center;
 }
 
 .skill-icon {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 6px;
-  cursor: default;
 }
 
-.skill-icon__circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 1px solid var(--color, #888);
-  background: rgba(255, 255, 255, 0.03);
+.skill-icon__box {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: #131313;
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.7),
+    -2px -2px 8px rgba(255, 255, 255, 0.03);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  font-size: 36px;
 }
 
-.skill-icon:hover .skill-icon__circle {
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
+.skill-icon:hover .skill-icon__box {
+  transform: translateY(-2px);
+  background: #1a1a1a;
+  box-shadow:
+    8px 8px 16px rgba(0, 0, 0, 0.8),
+    -2px -2px 10px rgba(255, 255, 255, 0.05);
+  color: var(--accent);
 }
 
-.skill-icon__abbr {
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--color, #888);
+.about__skills-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  width: 100%;
 }
 
-.skill-icon__name {
-  font-size: 9px;
-  color: var(--text-muted);
-  text-align: center;
-  max-width: 48px;
-  line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.about__skills-actions {
+  display: flex;
+  justify-content: center;
 }
+
+
 
 @media (max-width: 900px) {
   .about__content {
-    padding: 80px 24px;
-    border-left: none;
-    border-top: 1px solid var(--border);
+    padding: 80px 30px;
   }
 
   .about__visual {

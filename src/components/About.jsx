@@ -1,50 +1,29 @@
 import { useState } from 'react';
 import { education } from '../data/portfolio';
 import { useIntersection } from '../hooks/useIntersection';
+import About3DVisual from './About3DVisual';
 import './About.css';
 
-/* Wireframe 3D head using CSS */
-function WireframeAvatar() {
-  return (
-    <div className="wireframe-avatar" aria-hidden="true">
-      <div className="wireframe-avatar__sphere">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="wireframe-avatar__ring" style={{ '--i': i }} />
-        ))}
-        {/* Central glow */}
-        <div className="wireframe-avatar__core" />
-        {/* Orbiting dots */}
-        {Array.from({ length: 24 }).map((_, i) => (
-          <div
-            key={i}
-            className="wireframe-avatar__dot"
-            style={{ '--angle': `${i * 15}deg`, '--radius': `${80 + (i % 3) * 30}px` }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
+/* Removed WireframeAvatar */
 
 /* Skill icon grid */
 const TECH_ICONS = {
-  Languages: ['Python', 'JavaScript', 'Java', 'PHP', 'C', 'SQL', 'HTML', 'CSS'],
-  Frameworks: ['React', 'Django', 'Django REST', 'PyTorch', 'TensorFlow', 'Laravel', 'Node.js', 'Bootstrap'],
-  AI: ['Machine Learning', 'Deep Learning', 'Computer Vision', 'NLP', 'OpenCV', 'Scikit-learn'],
-  Tools: ['Git', 'Docker', 'MySQL', 'PostgreSQL', 'VS Code', 'Linux'],
+  'FRONT-END': ['HTML', 'CSS', 'JavaScript', 'Bootstrap', 'React', 'Tailwind'],
+  'BACK-END': ['Python', 'MySQL', 'Django', 'Docker', 'Git'],
 };
 
-const ICON_COLORS = {
-  Python: '#3572A5', JavaScript: '#F0DB4F', Java: '#E76F00', PHP: '#787CB5',
-  C: '#555555', SQL: '#e38c00', HTML: '#e34c26', CSS: '#264de4',
-  React: '#61DBFB', Django: '#092E20', 'Django REST': '#a30000',
-  PyTorch: '#EE4C2C', TensorFlow: '#FF6F00', Laravel: '#FF2D20',
-  'Node.js': '#68A063', Bootstrap: '#7952B3',
-  'Machine Learning': '#9b59b6', 'Deep Learning': '#e74c3c',
-  'Computer Vision': '#1abc9c', NLP: '#3498db',
-  OpenCV: '#5c3317', 'Scikit-learn': '#f89939',
-  Git: '#F1502F', Docker: '#2496ED', MySQL: '#00758F',
-  PostgreSQL: '#336791', 'VS Code': '#007ACC', Linux: '#333333',
+const DEVICON_CLASSES = {
+  HTML: 'devicon-html5-plain colored',
+  CSS: 'devicon-css3-plain colored',
+  JavaScript: 'devicon-javascript-plain colored',
+  Bootstrap: 'devicon-bootstrap-plain colored',
+  React: 'devicon-react-original colored',
+  Tailwind: 'devicon-tailwindcss-original colored',
+  MySQL: 'devicon-mysql-plain colored',
+  Python: 'devicon-python-plain colored',
+  Django: 'devicon-django-plain',
+  Docker: 'devicon-docker-plain colored',
+  Git: 'devicon-git-plain colored',
 };
 
 export default function About() {
@@ -56,7 +35,7 @@ export default function About() {
       <div className="about__layout">
         {/* Left – Wireframe Visual */}
         <div className="about__visual">
-          <WireframeAvatar />
+          <About3DVisual />
         </div>
 
         {/* Right – Content */}
@@ -109,44 +88,65 @@ export default function About() {
                 </div>
               ))}
 
-              <a
-                href="https://github.com/fahim06"
-                target="_blank"
-                rel="noreferrer"
-                className="about__cv-btn"
-                id="about-download-cv"
-                aria-label="View GitHub profile (CV available on request)"
-              >
-                VIEW GITHUB
-              </a>
+              <div className="about__actions">
+                <a
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="about__cv-btn"
+                  aria-label="Download CV"
+                >
+                  DOWNLOAD CV
+                </a>
+                <a
+                  href="https://github.com/fahim06"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="about__cv-btn"
+                  id="about-download-cv"
+                  aria-label="View GitHub profile"
+                >
+                  VIEW GITHUB
+                </a>
+              </div>
             </div>
           )}
 
           {/* Skills */}
           {activeTab === 'skills' && (
-            <div className="about__skills" role="tabpanel" id="tabpanel-skills" aria-labelledby="tab-skills">
-              {Object.entries(TECH_ICONS).map(([group, items]) => (
-                <div key={group} className="skill-group">
-                  <h4 className="skill-group__label letter-spaced">{group}</h4>
-                  <div className="skill-group__icons">
-                    {items.map((tech) => (
-                      <div
-                        key={tech}
-                        className="skill-icon"
-                        title={tech}
-                        style={{ '--color': ICON_COLORS[tech] || '#888' }}
-                      >
-                        <div className="skill-icon__circle">
-                          <span className="skill-icon__abbr">
-                            {tech.slice(0, 2).toUpperCase()}
-                          </span>
+            <div className="about__skills-wrapper" role="tabpanel" id="tabpanel-skills" aria-labelledby="tab-skills">
+              <div className="about__skills-columns">
+                {Object.entries(TECH_ICONS).map(([group, items]) => (
+                  <div key={group} className="skill-group">
+                    <h4 className="skill-group__label letter-spaced">{group}</h4>
+                    <div className="skill-group__icons">
+                      {items.map((tech) => (
+                        <div
+                          key={tech}
+                          className="skill-icon"
+                          title={tech}
+                        >
+                          <div className="skill-icon__box">
+                            <i className={DEVICON_CLASSES[tech]}></i>
+                          </div>
                         </div>
-                        <span className="skill-icon__name">{tech}</span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              <div className="about__skills-actions">
+                <a
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="about__cv-btn"
+                  aria-label="Download CV"
+                >
+                  DOWNLOAD CV
+                </a>
+              </div>
             </div>
           )}
         </div>
