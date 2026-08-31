@@ -39,7 +39,7 @@ jobs:
   # Each control is a real, independently visible GitHub Actions job.
   # ═══════════════════════════════════════════════════════════════════════════════
   branching-strategy:
-    name: Quality & Security • Branching Strategy
+    name: Enforce Branching Strategy
     runs-on: ubuntu-latest
     permissions:
       contents: read
