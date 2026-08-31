@@ -642,7 +642,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   deploy-pages:
-    name: Deployments • GitHub Pages • ${{ github.ref_name }}
+    name: Deployments • GitHub Pages
     needs:
       - build-node22
       - build-node24
