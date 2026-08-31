@@ -52,27 +52,40 @@ img {
 .cursor__dot {
   width: 8px;
   height: 8px;
-  background: #fff;
+  background: var(--accent);
   border-radius: 50%;
   position: fixed;
   transform: translate(-50%, -50%);
-  transition: transform 0.1s ease;
+  transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease;
   z-index: 9999;
   pointer-events: none;
   /* must not intercept clicks */
 }
 
+.cursor__dot--hover {
+  width: 12px;
+  height: 12px;
+  background: #fff;
+}
+
 .cursor__ring {
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--accent);
   border-radius: 50%;
   position: fixed;
   transform: translate(-50%, -50%);
-  transition: all 0.15s ease;
+  transition: all 0.15s ease, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
   z-index: 9998;
   pointer-events: none;
   /* must not intercept clicks */
+}
+
+.cursor__ring--hover {
+  width: 60px;
+  height: 60px;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* ── CSS Variables ───────────────────────────────────── */
