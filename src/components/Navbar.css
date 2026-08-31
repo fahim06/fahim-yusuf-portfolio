@@ -34,7 +34,7 @@
 }
 
 .navbar__logo:hover {
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: var(--accent);
 }
 
 .navbar__logo:hover .navbar__logo-text {
@@ -64,6 +64,7 @@
 }
 
 .navbar__hamburger:hover span {
+  background: var(--accent);
   box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent), 0 0 40px var(--accent);
 }
 

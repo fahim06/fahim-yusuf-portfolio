@@ -1,30 +1,10 @@
 import { useState } from 'react';
 import { education } from '../data/portfolio';
 import { useIntersection } from '../hooks/useIntersection';
+import About3DVisual from './About3DVisual';
 import './About.css';
 
-/* Wireframe 3D head using CSS */
-function WireframeAvatar() {
-  return (
-    <div className="wireframe-avatar" aria-hidden="true">
-      <div className="wireframe-avatar__sphere">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="wireframe-avatar__ring" style={{ '--i': i }} />
-        ))}
-        {/* Central glow */}
-        <div className="wireframe-avatar__core" />
-        {/* Orbiting dots */}
-        {Array.from({ length: 24 }).map((_, i) => (
-          <div
-            key={i}
-            className="wireframe-avatar__dot"
-            style={{ '--angle': `${i * 15}deg`, '--radius': `${80 + (i % 3) * 30}px` }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
+/* Removed WireframeAvatar */
 
 /* Skill icon grid */
 const TECH_ICONS = {
@@ -55,7 +35,7 @@ export default function About() {
       <div className="about__layout">
         {/* Left – Wireframe Visual */}
         <div className="about__visual">
-          <WireframeAvatar />
+          <About3DVisual />
         </div>
 
         {/* Right – Content */}
@@ -155,7 +135,7 @@ export default function About() {
                   </div>
                 ))}
               </div>
-              <div className="about__skills-divider"></div>
+
               <div className="about__skills-actions">
                 <a
                   href="/resume.pdf"

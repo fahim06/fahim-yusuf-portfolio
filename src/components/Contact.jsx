@@ -1,12 +1,17 @@
 import { useState } from 'react';
 import { useIntersection } from '../hooks/useIntersection';
+import Contact3DVisual from './Contact3DVisual';
 import './Contact.css';
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); /* idle | submitting | success | error */
+  const [isHoveringSubmit, setIsHoveringSubmit] = useState(false);
   const [ref, visible] = useIntersection();
+
+  // Track if user has typed anything
+  const isTyping = status === 'idle' && (form.name.length > 0 || form.email.length > 0 || form.message.length > 0);
 
   const validate = () => {
     const errs = {};
@@ -59,133 +64,140 @@ export default function Contact() {
 
   return (
     <section id="contact" className="contact section">
-      <div ref={ref} className={`contact__inner container ${visible ? 'fade-up visible' : 'fade-up'}`}>
-        <h2 className="contact__heading">Contact</h2>
-        <div className="contact__divider" />
+      <div className="contact__layout">
+        <div ref={ref} className={`contact__inner ${visible ? 'fade-up visible' : 'fade-up'}`}>
+          <h2 className="contact__heading">Contact</h2>
 
-        <p className="contact__intro italic-serif">
-          "Feel free to reach out, let's discuss your next project,
-          collaboration, or just connect."
-        </p>
 
-        {/* Accessible live region for form status announcements */}
-        <div aria-live="polite" aria-atomic="true" className="sr-only">
-          {status === 'success' && 'Your message has been sent. You should receive a confirmation email shortly.'}
-          {status === 'error' && 'There was a problem sending your message. Please try again or email directly.'}
-        </div>
+          <p className="contact__intro italic-serif">
+            "Feel free to reach out, let's discuss your next project,
+            collaboration, or just connect."
+          </p>
 
-        {status === 'success' ? (
-          <div className="contact__success" role="alert">
-            <span className="contact__success-icon" aria-hidden="true">✓</span>
-            <p>Message sent! You&apos;ll receive a confirmation email shortly. I&apos;ll get back to you within 24–48 hours.</p>
+          {/* Accessible live region for form status announcements */}
+          <div aria-live="polite" aria-atomic="true" className="sr-only">
+            {status === 'success' && 'Your message has been sent. You should receive a confirmation email shortly.'}
+            {status === 'error' && 'There was a problem sending your message. Please try again or email directly.'}
           </div>
-        ) : status === 'error' ? (
-          <div className="contact__error" role="alert">
-            <span className="contact__error-icon" aria-hidden="true">✕</span>
-            <p>Something went wrong. Please try again or email me directly at{' '}
-              <a href="mailto:fahim.yusuf06@gmail.com" className="contact__error-link">fahim.yusuf06@gmail.com</a>.
-            </p>
-            <button onClick={handleRetry} className="contact__retry">
-              Try Again
-            </button>
-          </div>
-        ) : (
-          <form
-            className="contact__form"
-            onSubmit={handleSubmit}
-            id="contact-form"
-            noValidate
-            aria-label="Contact form"
-          >
-            <div className="contact__row">
-              <div className="contact__field">
-                <label htmlFor="contact-name" className="contact__label">
-                  Name <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Your Name"
-                  value={form.name}
-                  onChange={(e) => { setForm({ ...form, name: e.target.value }); setErrors({ ...errors, name: '' }); }}
-                  required
-                  className={`contact__input ${errors.name ? 'contact__input--error' : ''}`}
-                  id="contact-name"
-                  aria-required="true"
-                  aria-describedby={errors.name ? 'error-name' : undefined}
-                  autoComplete="name"
-                />
-                {errors.name && (
-                  <span id="error-name" className="contact__field-error" role="alert">{errors.name}</span>
-                )}
-              </div>
 
-              <div className="contact__field">
-                <label htmlFor="contact-email" className="contact__label">
-                  Email <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  value={form.email}
-                  onChange={(e) => { setForm({ ...form, email: e.target.value }); setErrors({ ...errors, email: '' }); }}
-                  required
-                  className={`contact__input ${errors.email ? 'contact__input--error' : ''}`}
-                  id="contact-email"
-                  aria-required="true"
-                  aria-describedby={errors.email ? 'error-email' : undefined}
-                  autoComplete="email"
-                />
-                {errors.email && (
-                  <span id="error-email" className="contact__field-error" role="alert">{errors.email}</span>
-                )}
-              </div>
+          {status === 'success' ? (
+            <div className="contact__success" role="alert">
+              <span className="contact__success-icon" aria-hidden="true">✓</span>
+              <p>Message sent! You&apos;ll receive a confirmation email shortly. I&apos;ll get back to you within 24–48 hours.</p>
             </div>
-
-            <div className="contact__field">
-              <label htmlFor="contact-message" className="contact__label">
-                Message <span aria-hidden="true">*</span>
-              </label>
-              <textarea
-                placeholder="Tell me about your project or idea..."
-                value={form.message}
-                onChange={(e) => { setForm({ ...form, message: e.target.value }); setErrors({ ...errors, message: '' }); }}
-                required
-                rows={6}
-                className={`contact__input contact__textarea ${errors.message ? 'contact__input--error' : ''}`}
-                id="contact-message"
-                aria-required="true"
-                aria-describedby={errors.message ? 'error-message' : undefined}
-              />
-              {errors.message && (
-                <span id="error-message" className="contact__field-error" role="alert">{errors.message}</span>
-              )}
+          ) : status === 'error' ? (
+            <div className="contact__error" role="alert">
+              <span className="contact__error-icon" aria-hidden="true">✕</span>
+              <p>Something went wrong. Please try again or email me directly at{' '}
+                <a href="mailto:fahim.yusuf06@gmail.com" className="contact__error-link">fahim.yusuf06@gmail.com</a>.
+              </p>
+              <button onClick={handleRetry} className="contact__retry">
+                Try Again
+              </button>
             </div>
-
-            <p className="contact__privacy-note">
-              * Required. Your details are used only to respond to your message.
-            </p>
-
-            <button
-              type="submit"
-              className={`contact__submit ${status === 'submitting' ? 'contact__submit--loading' : ''}`}
-              id="contact-submit"
-              disabled={status === 'submitting'}
-              aria-disabled={status === 'submitting'}
+          ) : (
+            <form
+              className="contact__form"
+              onSubmit={handleSubmit}
+              id="contact-form"
+              noValidate
+              aria-label="Contact form"
             >
-              {status === 'submitting' ? 'SENDING…' : 'SEND MESSAGE'}
-            </button>
-          </form>
-        )}
+              <div className="contact__row">
+                <div className="contact__field">
+                  <label htmlFor="contact-name" className="contact__label">
+                    Name <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Your Name"
+                    value={form.name}
+                    onChange={(e) => { setForm({ ...form, name: e.target.value }); setErrors({ ...errors, name: '' }); }}
+                    required
+                    className={`contact__input ${errors.name ? 'contact__input--error' : ''}`}
+                    id="contact-name"
+                    aria-required="true"
+                    aria-describedby={errors.name ? 'error-name' : undefined}
+                    autoComplete="name"
+                  />
+                  {errors.name && (
+                    <span id="error-name" className="contact__field-error" role="alert">{errors.name}</span>
+                  )}
+                </div>
 
-        <div className="contact__info">
-          <a href="mailto:fahim.yusuf06@gmail.com" className="contact__info-item">
-            <span className="letter-spaced">EMAIL</span>
-            <span>fahim.yusuf06@gmail.com</span>
-          </a>
-          <div className="contact__info-item">
-            <span className="letter-spaced">LOCATION</span>
-            <span>Dhaka, Bangladesh</span>
+                <div className="contact__field">
+                  <label htmlFor="contact-email" className="contact__label">
+                    Email <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={form.email}
+                    onChange={(e) => { setForm({ ...form, email: e.target.value }); setErrors({ ...errors, email: '' }); }}
+                    required
+                    className={`contact__input ${errors.email ? 'contact__input--error' : ''}`}
+                    id="contact-email"
+                    aria-required="true"
+                    aria-describedby={errors.email ? 'error-email' : undefined}
+                    autoComplete="email"
+                  />
+                  {errors.email && (
+                    <span id="error-email" className="contact__field-error" role="alert">{errors.email}</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="contact__field">
+                <label htmlFor="contact-message" className="contact__label">
+                  Message <span aria-hidden="true">*</span>
+                </label>
+                <textarea
+                  placeholder="Tell me about your project or idea..."
+                  value={form.message}
+                  onChange={(e) => { setForm({ ...form, message: e.target.value }); setErrors({ ...errors, message: '' }); }}
+                  required
+                  rows={6}
+                  className={`contact__input contact__textarea ${errors.message ? 'contact__input--error' : ''}`}
+                  id="contact-message"
+                  aria-required="true"
+                  aria-describedby={errors.message ? 'error-message' : undefined}
+                />
+                {errors.message && (
+                  <span id="error-message" className="contact__field-error" role="alert">{errors.message}</span>
+                )}
+              </div>
+
+              <p className="contact__privacy-note">
+                * Required. Your details are used only to respond to your message.
+              </p>
+
+              <button
+                type="submit"
+                className={`contact__submit ${status === 'submitting' ? 'contact__submit--loading' : ''}`}
+                id="contact-submit"
+                disabled={status === 'submitting'}
+                aria-disabled={status === 'submitting'}
+                onMouseEnter={() => setIsHoveringSubmit(true)}
+                onMouseLeave={() => setIsHoveringSubmit(false)}
+              >
+                {status === 'submitting' ? 'SENDING…' : 'SEND MESSAGE'}
+              </button>
+            </form>
+          )}
+
+          <div className="contact__info">
+            <a href="mailto:fahim.yusuf06@gmail.com" className="contact__info-item">
+              <span className="letter-spaced">EMAIL</span>
+              <span>fahim.yusuf06@gmail.com</span>
+            </a>
+            <div className="contact__info-item">
+              <span className="letter-spaced">LOCATION</span>
+              <span>Dhaka, Bangladesh</span>
+            </div>
           </div>
+        </div>
+        <div className="contact__visual">
+          <Contact3DVisual formStatus={status} isTyping={isTyping} isHoveringSubmit={isHoveringSubmit} isVisible={visible} formData={form} />
         </div>
       </div>
     </section>

@@ -24,7 +24,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a 0%, #0e0e0e 100%);
+  background: transparent;
   overflow: hidden;
 }
 
@@ -128,7 +128,6 @@
   justify-content: center;
   gap: 32px;
   background: transparent;
-  border-left: 1px solid var(--border);
   min-height: 100vh;
 }
 
@@ -343,9 +342,7 @@
 
 @media (max-width: 900px) {
   .about__content {
-    padding: 80px 24px;
-    border-left: none;
-    border-top: 1px solid var(--border);
+    padding: 80px 30px;
   }
 
   .about__visual {

@@ -1,16 +1,38 @@
 /* ── Contact Section ───────────────────────────────── */
 .contact {
   background: transparent;
-  justify-content: center;
+  padding: 0;
+}
+
+.contact__layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  min-height: 70vh;
+}
+
+@media (max-width: 900px) {
+  .contact__layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 .contact__inner {
-  max-width: 700px;
   display: flex;
   flex-direction: column;
   gap: 32px;
-  padding-top: 100px;
-  padding-bottom: 100px;
+  padding: 20px 60px 80px 80px;
+  justify-content: center;
+}
+
+.contact__visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
 }
 
 .contact__heading {
@@ -99,7 +121,7 @@
 
 .contact__textarea {
   resize: vertical;
-  min-height: 140px;
+  min-height: 200px;
 }
 
 .contact__privacy-note {
