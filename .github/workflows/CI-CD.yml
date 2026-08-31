@@ -1,10 +1,14 @@
 name: 🚀 Portfolio CI/CD Pipeline
 
 on:
+  # Trigger on every branch. Job-level guards keep production-only operations
+  # restricted to main while all branches receive CI validation.
   push:
-    branches: [main, dev]
+    branches:
+      - '**'
   pull_request:
-    branches: [main, dev]
+    branches:
+      - '**'
   schedule:
     - cron: '0 3 * * 1'
   workflow_dispatch:
@@ -31,7 +35,7 @@ env:
 
 jobs:
   # ═══════════════════════════════════════════════════════════════════════════════
-  # QUALITY & SECURITY — intentionally NO matrix strategy
+  # QUALITY & SECURITY
   # Each control is a real, independently visible GitHub Actions job.
   # ═══════════════════════════════════════════════════════════════════════════════
   branching-strategy:
@@ -92,7 +96,7 @@ jobs:
         if: >
           github.ref != 'refs/heads/main' &&
           github.event_name != 'pull_request'
-        run: echo "ℹ️ Branching enforcement is active for main releases and PRs targeting main."
+        run: echo "ℹ️ Non-main branches run CI validation; production branching enforcement is reserved for main."
 
   pr-classification:
     name: Quality & Security • PR Classification & Size
@@ -311,7 +315,7 @@ jobs:
         run: npm audit --audit-level=high
 
   # ═══════════════════════════════════════════════════════════════════════════════
-  # BUILD & VALIDATE — NO matrix strategy
+  # BUILD & VALIDATE
   # Node 22 and Node 24 are separate visible jobs.
   # ═══════════════════════════════════════════════════════════════════════════════
   build-node22:
@@ -488,7 +492,7 @@ jobs:
           PY
 
   # ═══════════════════════════════════════════════════════════════════════════════
-  # DEPLOYMENTS — three independent visible jobs
+  # DEPLOYMENTS — Vercel is restricted; GitHub Pages is branch-wide
   # ═══════════════════════════════════════════════════════════════════════════════
   deploy-production:
     name: Deployments • Production (Vercel)
@@ -638,14 +642,16 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   deploy-pages:
-    name: Deployments • GitHub Pages
+    name: Deployments • GitHub Pages • ${{ github.ref_name }}
     needs:
       - build-node22
       - build-node24
       - seo-static-assets
+    # GitHub Pages is intentionally enabled for every branch push.
+    # Vercel production/preview and post-deployment smoke tests remain guarded below.
     if: >
-      github.ref == 'refs/heads/main' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      github.event_name == 'push' &&
+      startsWith(github.ref, 'refs/heads/')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
