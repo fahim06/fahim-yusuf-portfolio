@@ -10,12 +10,11 @@ on:
       - main
       - dev
   schedule:
-    # Run weekly security scan on Mondays at 03:00 UTC
     - cron: '0 3 * * 1'
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target Deployment Environment'
+        description: 'Target deployment environment'
         required: true
         default: 'production'
         type: choice
@@ -23,148 +22,336 @@ on:
           - production
           - preview
 
+# Least-privilege default. Individual jobs elevate only what they need.
 permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-  security-events: write
-  actions: read
-  pages: write
-  id-token: write
-  deployments: write
-  statuses: write
+  contents: read
 
 concurrency:
-  group: deployment-${{ github.ref }}
+  group: ci-cd-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  NODE_VERSION: '24'
+  PROD_URL: 'https://fahimyusuf.com.bd/'
+
 jobs:
-  # ── 1. Enforce Branching Strategy ────────────────────────────────────────────
+  # ── 1. Branching strategy ─────────────────────────────────────────────────────
   enforce-branching:
     name: Enforce Branching Strategy
-    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    if: >
+      (github.event_name == 'pull_request' && github.base_ref == 'main') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
-      - name: Check source branch
+      - name: Validate PR source branch
+        if: github.event_name == 'pull_request'
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
         run: |
-          if [ "${{ github.head_ref }}" != "dev" ]; then
-            echo "Error: Pull requests targeting the 'main' branch MUST originate from the 'dev' branch."
-            echo "You are attempting to merge from '${{ github.head_ref }}'."
+          set -euo pipefail
+          if [[ "$HEAD_BRANCH" != "dev" ]]; then
+            echo "::error::Pull requests into main must originate from dev."
+            echo "Detected source branch: $HEAD_BRANCH"
             exit 1
           fi
-          echo "Branch check passed! Source branch is dev."
+          echo "Branching strategy passed: dev -> main."
 
-  # ── 2. PR Automation ─────────────────────────────────────────────────────────
-  pr-automation:
-    name: PR Classification & Size Labeler
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-
-      - name: Analyze PR Size & Add Label
+      - name: Validate main commit came through dev PR
+        if: github.event_name != 'pull_request'
         uses: actions/github-script@v9
         with:
           script: |
-            const { data: files } = await github.rest.pulls.listFiles({
+            const sha = context.sha;
+            const prs = await github.paginate(
+              github.rest.repos.listPullRequestsAssociatedWithCommit,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                commit_sha: sha,
+                per_page: 100
+              }
+            );
+
+            const valid = prs.find(
+              pr =>
+                pr.state === 'closed' &&
+                pr.merged_at &&
+                pr.base.ref === 'main' &&
+                pr.head.ref === 'dev'
+            );
+
+            if (!valid) {
+              core.setFailed(
+                `Commit ${sha} is not associated with a merged dev -> main pull request. Direct commits to main are blocked by this workflow.`
+              );
+              return;
+            }
+
+            core.notice(
+              `Branching strategy passed: ${valid.head.ref} -> ${valid.base.ref} via PR #${valid.number}.`
+            );
+
+  # ── 2. PR classification + size ──────────────────────────────────────────────
+  # On PRs: classify the open PR.
+  # On main: classify the merged dev -> main PR associated with the commit.
+  pr-automation:
+    name: PR Classification & Size
+    if: >
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Classify PR and calculate size
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const sizeLabels = ['size/xs', 'size/s', 'size/m', 'size/l', 'size/xl'];
+            const typeLabels = [
+              'type/feat', 'type/fix', 'type/refactor', 'type/docs',
+              'type/test', 'type/chore', 'type/perf', 'type/ci', 'type/build', 'type/style'
+            ];
+
+            async function ensureLabel(name) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name
+                });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                  color: '6B7280'
+                });
+              }
+            }
+
+            let pr;
+
+            if (context.eventName === 'pull_request') {
+              pr = context.payload.pull_request;
+            } else {
+              const prs = await github.paginate(
+                github.rest.repos.listPullRequestsAssociatedWithCommit,
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  commit_sha: context.sha,
+                  per_page: 100
+                }
+              );
+
+              pr = prs.find(
+                item =>
+                  item.state === 'closed' &&
+                  item.merged_at &&
+                  item.base.ref === 'main' &&
+                  item.head.ref === 'dev'
+              );
+
+              if (!pr) {
+                core.setFailed(
+                  `No merged dev -> main PR is associated with commit ${context.sha}.`
+                );
+                return;
+              }
+
+              core.notice(`Classifying merged PR #${pr.number} (${pr.title}).`);
+            }
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.issue.number
+              pull_number: pr.number,
+              per_page: 100
             });
-            
-            const totalChanges = files.reduce((acc, file) => acc + file.changes, 0);
-            let sizeLabel = 'size/xs';
-            if (totalChanges > 500) sizeLabel = 'size/xl';
-            else if (totalChanges > 200) sizeLabel = 'size/l';
-            else if (totalChanges > 80) sizeLabel = 'size/m';
-            else if (totalChanges > 20) sizeLabel = 'size/s';
+
+            const totalChanges = files.reduce(
+              (sum, file) => sum + (file.additions || 0) + (file.deletions || 0),
+              0
+            );
+
+            let size = 'xs';
+            if (totalChanges > 500) size = 'xl';
+            else if (totalChanges > 200) size = 'l';
+            else if (totalChanges > 80) size = 'm';
+            else if (totalChanges > 20) size = 's';
+
+            const title = pr.title.trim();
+            const conventional = title.match(/^(feat|fix|refactor|docs|test|chore|perf|ci|build|style)(\([^)]+\))?!?:/i);
+            const typeMap = {
+              feat: 'type/feat',
+              fix: 'type/fix',
+              refactor: 'type/refactor',
+              docs: 'type/docs',
+              test: 'type/test',
+              chore: 'type/chore',
+              perf: 'type/perf',
+              ci: 'type/ci',
+              build: 'type/build',
+              style: 'type/style'
+            };
+
+            const typeLabel = conventional
+              ? typeMap[conventional[1].toLowerCase()]
+              : 'type/chore';
 
             try {
+              for (const label of [...sizeLabels, ...typeLabels]) {
+                await ensureLabel(label);
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    name: label
+                  });
+                } catch (error) {
+                  if (error.status !== 404) throw error;
+                }
+              }
+
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.issue.number,
-                labels: [sizeLabel]
+                issue_number: pr.number,
+                labels: [`size/${size}`, typeLabel]
               });
-            } catch (err) {
-              console.log('Notice: Could not attach label (may require label creation permissions):', err.message);
+            } catch (error) {
+              core.warning(`Classification succeeded, but labels could not be updated: ${error.message}`);
             }
 
-  # ── 3. Security: SAST & Secrets ──────────────────────────────────────────────
+            await core.summary
+              .addHeading('PR Classification')
+              .addTable([
+                [{data: 'Metric', header: true}, {data: 'Result', header: true}],
+                ['PR', `#${pr.number}`],
+                ['Type', typeLabel.replace('type/', '')],
+                ['Size', `size/${size}`],
+                ['Changed lines', String(totalChanges)],
+                ['Files changed', String(files.length)]
+              ])
+              .write();
+
+  # ── 3. CodeQL + secrets ──────────────────────────────────────────────────────
   security-sast:
     name: CodeQL & Secret Scanning
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     steps:
-      - name: Checkout repository with full history
+      - name: Checkout full history
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - name: Initialize CodeQL for JavaScript / TypeScript
+      - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: javascript-typescript
           queries: security-extended,security-and-quality
 
-      - name: Perform CodeQL Analysis
+      - name: Analyze with CodeQL
         uses: github/codeql-action/analyze@v4
         with:
           category: "/language:javascript-typescript"
 
-      - name: Run Gitleaks secret scanner
+      - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: false
 
-  # ── 4. Security: Dependency Review ───────────────────────────────────────────
-  dependency-review:
-    name: Dependency Vulnerability Review
-    if: github.event_name == 'pull_request'
+  # ── 4. Dependency vulnerabilities ─────────────────────────────────────────────
+  # Dependency-review is PR-native. Main is protected independently with a
+  # blocking lockfile-aware npm audit so the same security gate exists on main.
+  dependency-vulnerability:
+    name: Dependency Vulnerability Gate
+    if: >
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'schedule'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Review PR Dependency Changes
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install exact lockfile dependencies
+        run: npm ci
+
+      - name: Review dependency changes on PR
+        if: github.event_name == 'pull_request'
         uses: actions/dependency-review-action@v5
         with:
           fail-on-severity: high
-          comment-summary-in-pr: true
+          comment-summary-in-pr: false
+          show-patched-versions: true
 
-  # ── 5. Code Quality & Linting ────────────────────────────────────────────────
+      - name: Full dependency audit on main
+        if: github.event_name != 'pull_request'
+        run: npm audit --audit-level=high
+
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+  # ── 5. Lint + audit ──────────────────────────────────────────────────────────
   lint-and-audit:
-    name: Lint & Audit (Node 22)
+    name: Lint & Audit
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Setup Node.js 22
+      - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 22
-          cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Oxlint code analyzer
+      - name: Run lint
         run: npm run lint
 
-      - name: Check dependencies for high/critical CVEs
-        run: |
-          npm audit --audit-level=high || true
+      - name: Run blocking npm audit
+        run: npm audit --audit-level=high
 
-  # ── 6. Build Validation ──────────────────────────────────────────────────────
+  # ── 6. Build validation ───────────────────────────────────────────────────────
   build:
     name: Build & Bundle Validation (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
-    needs: [lint-and-audit]
     strategy:
+      fail-fast: false
       matrix:
         node-version: [22, 24]
+    permissions:
+      contents: read
+      pages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -173,7 +360,7 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -181,68 +368,149 @@ jobs:
       - name: Build production bundle
         run: npm run build
 
-      - name: Verify build artifacts exist
+      - name: Verify build output
         run: |
-          if [ ! -f "dist/index.html" ]; then
-            echo "Error: dist/index.html was not generated!"
-            exit 1
-          fi
-          echo "Production build verified successfully."
+          set -euo pipefail
+          test -f dist/index.html
+          test -s dist/index.html
+          echo "Production build is present and non-empty."
 
-      - name: Upload production artifact (Node 22 only)
-        if: matrix.node-version == 22
+      - name: Upload production artifact
+        if: matrix.node-version == 24
         uses: actions/upload-artifact@v7
         with:
           name: production-dist
           path: dist/
+          if-no-files-found: error
           retention-days: 7
 
-      - name: Upload dist for pages
-        if: matrix.node-version == 22
-        uses: actions/upload-pages-artifact@v5
+      - name: Upload GitHub Pages artifact
+        if: matrix.node-version == 24
+        uses: actions/upload-pages-artifact@v4
         with:
-          path: 'dist/'
+          path: dist/
 
-  # ── 7. SEO & Asset Integrity Check ───────────────────────────────────────────
+  # ── 7. SEO + static asset integrity ───────────────────────────────────────────
   seo-and-links:
     name: SEO & Static Asset Validation
-    runs-on: ubuntu-latest
     needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-
-      - name: Download build artifact
+      - name: Download production artifact
         uses: actions/download-artifact@v8
         with:
           name: production-dist
           path: dist
 
-      - name: Verify Sitemap and Robots.txt match target domain
+      - name: Validate SEO files and metadata
+        env:
+          TARGET_URL: https://fahimyusuf.com.bd/
         run: |
-          TARGET_URL="https://fahimyusuf.com.bd/"
-          echo "Checking sitemap.xml for target URL: $TARGET_URL"
-          grep -q "https://fahimyusuf.com.bd/" dist/sitemap.xml || (echo "Missing target URL in dist/sitemap.xml" && exit 1)
-          
-          echo "Checking robots.txt for sitemap reference"
-          grep -q "https://fahimyusuf.com.bd/sitemap.xml" dist/robots.txt || (echo "Missing sitemap in dist/robots.txt" && exit 1)
-          
-          echo "Static SEO & link checks passed."
+          set -euo pipefail
 
-  # ── 8. Vercel Preview Deployment ─────────────────────────────────────────────
+          test -s dist/index.html
+          test -s dist/robots.txt
+          test -s dist/sitemap.xml
+
+          grep -Fq "$TARGET_URL" dist/sitemap.xml
+          grep -Fq "Sitemap: ${TARGET_URL}sitemap.xml" dist/robots.txt
+
+          python3 <<'PY'
+          import re
+          from pathlib import Path
+
+          html = Path("dist/index.html").read_text(encoding="utf-8", errors="ignore")
+          assert re.search(r"<title>\s*[^<]+\s*</title>", html, re.I), "Missing non-empty <title>."
+          desc = re.search(r"<meta\b[^>]*\bname=[\"']description[\"'][^>]*\bcontent=[\"'][^\"']+[\"']", html, re.I)
+          desc = desc or re.search(r"<meta\b[^>]*\bcontent=[\"'][^\"']+[\"'][^>]*\bname=[\"']description[\"']", html, re.I)
+          assert desc, "Missing non-empty meta description."
+          PY
+
+          echo "SEO metadata, robots.txt, and sitemap.xml passed."
+
+      - name: Validate local static asset references
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          from urllib.parse import urlparse, unquote
+
+          root = Path("dist")
+          html = (root / "index.html").read_text(encoding="utf-8", errors="ignore")
+
+          class AssetParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.refs = []
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if tag in {"script", "img", "source", "video", "audio", "iframe"}:
+                      value = attrs.get("src")
+                  elif tag == "link":
+                      value = attrs.get("href")
+                  else:
+                      value = None
+                  if value:
+                      self.refs.append(value)
+
+          parser = AssetParser()
+          parser.feed(html)
+
+          missing = []
+          for ref in sorted(set(parser.refs)):
+              parsed = urlparse(ref)
+              if parsed.scheme in {"http", "https", "mailto", "tel"}:
+                  continue
+              path = unquote(parsed.path)
+              if not path or path.startswith("#") or path.endswith("/"):
+                  continue
+              candidate = (root / path.lstrip("/")).resolve()
+              if not candidate.is_file():
+                  missing.append(ref)
+
+          if missing:
+              print("Missing local assets:")
+              print("\n".join(missing))
+              raise SystemExit(1)
+
+          print(f"Checked {len(set(parser.refs))} HTML asset references; no missing local assets found.")
+          PY
+
+  # ── 8. Vercel preview deployment ─────────────────────────────────────────────
+  # PRs get a PR preview. Main also gets a non-production Vercel deployment so
+  # the exact main artifact is exercised before/alongside production.
   deploy-preview:
-    name: Deploy PR Preview to Vercel
-    needs: build
-    if: github.event_name == 'pull_request'
+    name: Deploy Vercel Preview
+    needs: [build, seo-and-links]
+    if: >
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' &&
+       github.ref == 'refs/heads/main' &&
+       github.event.inputs.environment == 'preview')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      deployments: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
+      - name: Require Vercel credentials
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          test -n "$VERCEL_TOKEN" || { echo "::error::Missing VERCEL_TOKEN secret."; exit 1; }
+          test -n "$VERCEL_ORG_ID" || { echo "::error::Missing VERCEL_ORG_ID secret."; exit 1; }
+          test -n "$VERCEL_PROJECT_ID" || { echo "::error::Missing VERCEL_PROJECT_ID secret."; exit 1; }
 
-      - name: Deploy PR Preview to Vercel
+      - name: Deploy to Vercel Preview
         id: vercel-preview
         uses: amondnet/vercel-action@v25
-        if: env.VERCEL_TOKEN != ''
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         with:
@@ -250,24 +518,58 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          github-comment: true
-        continue-on-error: true
+          github-comment: ${{ github.event_name == 'pull_request' }}
 
-  # ── 9. Vercel Production Deployment ──────────────────────────────────────────
+      - name: Record preview deployment
+        env:
+          PREVIEW_URL: ${{ steps.vercel-preview.outputs.preview-url }}
+        run: |
+          {
+            echo "## Vercel Preview"
+            echo
+            echo "Preview deployment completed."
+            if [[ -n "${PREVIEW_URL:-}" ]]; then
+              echo "URL: ${PREVIEW_URL}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ── 9. Vercel production deployment ───────────────────────────────────────────
   deploy-production:
     name: Deploy to Production (Vercel)
-    needs: [enforce-branching, security-sast, build]
-    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    needs:
+      - enforce-branching
+      - pr-automation
+      - security-sast
+      - dependency-vulnerability
+      - lint-and-audit
+      - build
+      - seo-and-links
+    if: >
+      github.ref == 'refs/heads/main' &&
+      (
+        github.event_name == 'push' ||
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+      )
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://fahimyusuf.com.bd/
+      url: ${{ env.PROD_URL }}
+    permissions:
+      contents: read
+      deployments: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
+      - name: Require Vercel credentials
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          test -n "$VERCEL_TOKEN" || { echo "::error::Missing VERCEL_TOKEN secret."; exit 1; }
+          test -n "$VERCEL_ORG_ID" || { echo "::error::Missing VERCEL_ORG_ID secret."; exit 1; }
+          test -n "$VERCEL_PROJECT_ID" || { echo "::error::Missing VERCEL_PROJECT_ID secret."; exit 1; }
 
-      - name: Deploy to Vercel Production
-        id: vercel-deploy
+      - name: Deploy production to Vercel
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
@@ -275,55 +577,117 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
           scope: ${{ secrets.VERCEL_ORG_ID }}
-        continue-on-error: true
 
-      - name: Log Deployment Status
+      - name: Record production deployment
         run: |
-          echo "=========================================================="
-          echo "🚀 Deployment successfully triggered for main branch!"
-          echo "Target Production URL: https://fahimyusuf.com.bd/"
-          echo "=========================================================="
+          {
+            echo "## Production Deployment"
+            echo
+            echo "Vercel production deployment completed."
+            echo "URL: ${PROD_URL}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
-  # ── 10. Post-Deployment Smoke Test ───────────────────────────────────────────
+  # ── 10. Production health + SSL smoke tests ───────────────────────────────────
   smoke-test:
-    name: Production Health & SSL Smoke Test
+    name: Production Health & SSL Smoke Tests
     needs: deploy-production
-    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    if: >
+      github.ref == 'refs/heads/main' &&
+      (
+        github.event_name == 'push' ||
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+      )
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - name: Wait for DNS & deployment propagation
-        run: sleep 10
-
-      - name: Verify Live Website Status
+      - name: Health check with retries
+        env:
+          URL: ${{ env.PROD_URL }}
         run: |
-          PROD_URL="https://fahimyusuf.com.bd/"
-          echo "Pinging Live Production URL: $PROD_URL"
-          
-          # Perform HTTP GET request and retrieve HTTP status code
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$PROD_URL" || echo "000")
-          echo "HTTP Response Status Code: $HTTP_STATUS"
-          
-          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
-            echo "✅ Smoke test passed! Production site is healthy and serving requests."
-          else
-            echo "⚠️ Notice: Endpoint returned HTTP $HTTP_STATUS. (May still be propagating if DNS was recently updated)."
-          fi
+          set -euo pipefail
 
-  # ── 11. GitHub Pages Deployment ──────────────────────────────────────────────
+          for attempt in {1..12}; do
+            status="$(curl -L -sS -o /tmp/prod.html -w '%{http_code}' \
+              --connect-timeout 10 --max-time 30 "$URL" || true)"
+
+            echo "Attempt $attempt/12 -> HTTP $status"
+
+            if [[ "$status" =~ ^2[0-9][0-9]$ ]]; then
+              echo "Production health check passed."
+              exit 0
+            fi
+
+            sleep 10
+          done
+
+          echo "::error::Production health check failed after 12 attempts."
+          exit 1
+
+      - name: Verify HTTPS certificate and expiry
+        env:
+          HOST: fahimyusuf.com.bd
+        run: |
+          set -euo pipefail
+
+          echo | openssl s_client \
+            -connect "${HOST}:443" \
+            -servername "${HOST}" \
+            -verify_return_error \
+            2>/tmp/openssl-error.log |
+            openssl x509 -noout -issuer -subject -dates
+
+          echo "Checking that the certificate remains valid for at least 7 days..."
+          echo | openssl s_client \
+            -connect "${HOST}:443" \
+            -servername "${HOST}" \
+            -verify_return_error 2>/dev/null |
+            openssl x509 -checkend 604800 -noout
+
+          echo "TLS certificate is valid and has at least 7 days remaining."
+
+      - name: Verify HTTPS response headers and canonical endpoints
+        env:
+          URL: ${{ env.PROD_URL }}
+        run: |
+          set -euo pipefail
+
+          headers="$(curl -L -sS -D - -o /dev/null --connect-timeout 10 --max-time 30 "$URL")"
+          printf '%s\n' "$headers"
+
+          grep -Eiq '^HTTP/[0-9.]+ 2[0-9][0-9]' <<< "$headers"
+
+          curl -fsSL --connect-timeout 10 --max-time 30 "${URL}robots.txt" >/dev/null
+          curl -fsSL --connect-timeout 10 --max-time 30 "${URL}sitemap.xml" >/dev/null
+
+          echo "HTTPS headers and robots/sitemap endpoints passed."
+
+  # ── 11. GitHub Pages deployment ───────────────────────────────────────────────
   deploy-pages:
     name: Deploy to GitHub Pages
-    needs: build
-    if: github.ref == 'refs/heads/main'
+    needs:
+      - enforce-branching
+      - pr-automation
+      - security-sast
+      - dependency-vulnerability
+      - lint-and-audit
+      - build
+      - seo-and-links
+    if: >
+      github.ref == 'refs/heads/main' &&
+      (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch'
+      )
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
     steps:
-      - name: Setup Pages
-        uses: actions/configure-pages@v6
-        with:
-          enablement: true
-
-      - name: Deploy to GitHub Pages
+      - name: Deploy validated artifact to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v4
