@@ -180,7 +180,7 @@
 /* CTA Button */
 .hero__cta {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(176, 38, 255, 0.5);
   border-radius: 50px;
   padding: 14px 48px;
   font-family: var(--mono);
@@ -197,14 +197,14 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(176, 38, 255, 0.1);
   opacity: 0;
   transition: opacity 0.4s ease;
 }
 
 .hero__cta:hover {
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.06);
+  border-color: var(--accent);
+  box-shadow: 0 0 30px rgba(176, 38, 255, 0.2);
   background-color: #121212;
 }
 
