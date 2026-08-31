@@ -279,7 +279,7 @@
 .skill-group__icons {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 16px 8px;
 }
 
 @media (min-width: 500px) {

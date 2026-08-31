@@ -28,10 +28,10 @@ function WireframeAvatar() {
 
 /* Skill icon grid */
 const TECH_ICONS = {
-  Languages: ['Python', 'JavaScript', 'Java', 'PHP', 'C', 'SQL', 'HTML', 'CSS'],
-  Frameworks: ['React', 'Django', 'Django REST', 'PyTorch', 'TensorFlow', 'Laravel', 'Node.js', 'Bootstrap'],
-  AI: ['Machine Learning', 'Deep Learning', 'Computer Vision', 'NLP', 'OpenCV', 'Scikit-learn'],
-  Tools: ['Git', 'Docker', 'MySQL', 'PostgreSQL', 'VS Code', 'Linux'],
+  Languages: ['Python', 'JavaScript', 'Java', 'SQL', 'HTML', 'CSS'],
+  Frameworks: ['React', 'Django', 'TensorFlow', 'Node.js', 'Bootstrap'],
+  AI: ['OpenCV', 'Scikit-learn'],
+  Tools: ['Git', 'MySQL', 'PostgreSQL', 'VS Code', 'Linux'],
 };
 
 const ICON_COLORS = {
