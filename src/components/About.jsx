@@ -28,23 +28,18 @@ function WireframeAvatar() {
 
 /* Skill icon grid */
 const TECH_ICONS = {
-  Languages: ['Python', 'JavaScript', 'Java', 'SQL', 'HTML', 'CSS'],
-  Frameworks: ['React', 'Django', 'TensorFlow', 'Node.js', 'Bootstrap'],
-  AI: ['OpenCV', 'Scikit-learn'],
-  Tools: ['Git', 'MySQL', 'PostgreSQL', 'VS Code', 'Linux'],
+  'FRONT-END': ['React', 'JavaScript', 'HTML', 'CSS', 'Bootstrap'],
+  'BACK-END': ['Python', 'Django', 'TensorFlow', 'OpenCV', 'Scikit-learn', 'Git', 'MySQL', 'PostgreSQL', 'Linux'],
 };
 
 const ICON_COLORS = {
-  Python: '#3572A5', JavaScript: '#F0DB4F', Java: '#E76F00', PHP: '#787CB5',
-  C: '#555555', SQL: '#e38c00', HTML: '#e34c26', CSS: '#264de4',
-  React: '#61DBFB', Django: '#092E20', 'Django REST': '#a30000',
-  PyTorch: '#EE4C2C', TensorFlow: '#FF6F00', Laravel: '#FF2D20',
-  'Node.js': '#68A063', Bootstrap: '#7952B3',
-  'Machine Learning': '#9b59b6', 'Deep Learning': '#e74c3c',
-  'Computer Vision': '#1abc9c', NLP: '#3498db',
+  Python: '#3572A5', JavaScript: '#F0DB4F', SQL: '#e38c00', HTML: '#e34c26', CSS: '#264de4',
+  React: '#61DBFB', Django: '#092E20',
+  TensorFlow: '#FF6F00',
+  Bootstrap: '#7952B3',
   OpenCV: '#5c3317', 'Scikit-learn': '#f89939',
-  Git: '#F1502F', Docker: '#2496ED', MySQL: '#00758F',
-  PostgreSQL: '#336791', 'VS Code': '#007ACC', Linux: '#333333',
+  Git: '#F1502F', MySQL: '#00758F',
+  PostgreSQL: '#336791', Linux: '#333333',
 };
 
 const DEVICON_CLASSES = {
@@ -136,16 +131,27 @@ export default function About() {
                 </div>
               ))}
 
-              <a
-                href="https://github.com/fahim06"
-                target="_blank"
-                rel="noreferrer"
-                className="about__cv-btn"
-                id="about-download-cv"
-                aria-label="View GitHub profile (CV available on request)"
-              >
-                VIEW GITHUB
-              </a>
+              <div className="about__actions">
+                <a
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="about__cv-btn"
+                  aria-label="Download CV"
+                >
+                  DOWNLOAD CV
+                </a>
+                <a
+                  href="https://github.com/fahim06"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="about__cv-btn"
+                  id="about-download-cv"
+                  aria-label="View GitHub profile"
+                >
+                  VIEW GITHUB
+                </a>
+              </div>
             </div>
           )}
 
@@ -178,6 +184,27 @@ export default function About() {
                   </div>
                 </div>
               ))}
+
+              <div className="about__actions" style={{ marginTop: '32px' }}>
+                <a
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="about__cv-btn"
+                  aria-label="Download CV"
+                >
+                  DOWNLOAD CV
+                </a>
+                <a
+                  href="https://github.com/fahim06"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="about__cv-btn"
+                  aria-label="View GitHub profile"
+                >
+                  VIEW GITHUB
+                </a>
+              </div>
             </div>
           )}
         </div>

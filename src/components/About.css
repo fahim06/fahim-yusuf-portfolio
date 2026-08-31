@@ -223,6 +223,12 @@
 }
 
 /* CV Button */
+.about__actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .about__cv-btn {
   display: inline-flex;
   align-items: center;
