@@ -35,7 +35,7 @@ function CategoryCard({ category, skillList, color, index }) {
   return (
     <div
       ref={ref}
-      className={`skill-cat glass-card ${visible ? 'skill-cat--visible' : ''}`}
+      className={`skill-cat glass-panel ${visible ? 'skill-cat--visible' : ''}`}
       style={{ transitionDelay: `${index * 0.1}s` }}
     >
       <div className="skill-cat__header">
