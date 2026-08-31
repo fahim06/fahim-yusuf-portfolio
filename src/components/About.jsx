@@ -28,45 +28,31 @@ function WireframeAvatar() {
 
 /* Skill icon grid */
 const TECH_ICONS = {
-  'FRONT-END': ['React', 'JavaScript', 'HTML', 'CSS', 'Bootstrap'],
-  'BACK-END': ['Python', 'Django', 'TensorFlow', 'OpenCV', 'Scikit-learn', 'Git', 'MySQL', 'PostgreSQL', 'Linux'],
-};
-
-const ICON_COLORS = {
-  Python: '#3572A5', JavaScript: '#F0DB4F', SQL: '#e38c00', HTML: '#e34c26', CSS: '#264de4',
-  React: '#61DBFB', Django: '#092E20',
-  TensorFlow: '#FF6F00',
-  Bootstrap: '#7952B3',
-  OpenCV: '#5c3317', 'Scikit-learn': '#f89939',
-  Git: '#F1502F', MySQL: '#00758F',
-  PostgreSQL: '#336791', Linux: '#333333',
+  'FRONT-END': ['HTML', 'CSS', 'JavaScript', 'Three.js', 'jQuery', 'Bootstrap', 'React', 'Vue', 'Tailwind'],
+  'BACK-END': ['Java', 'Spring', 'Hibernate', 'MySQL', 'Python', 'Django', 'MongoDB', 'Docker', 'Node.js', 'Git', 'Google Cloud'],
 };
 
 const DEVICON_CLASSES = {
-  Python: 'devicon-python-plain',
-  JavaScript: 'devicon-javascript-plain',
-  Java: 'devicon-java-plain',
-  PHP: 'devicon-php-plain',
-  C: 'devicon-c-plain',
-  SQL: 'devicon-azuresqldatabase-plain',
-  HTML: 'devicon-html5-plain',
-  CSS: 'devicon-css3-plain',
-  React: 'devicon-react-original',
+  HTML: 'devicon-html5-plain colored',
+  CSS: 'devicon-css3-plain colored',
+  JavaScript: 'devicon-javascript-plain colored',
+  'Three.js': 'devicon-threejs-original',
+  jQuery: 'devicon-jquery-plain colored',
+  Bootstrap: 'devicon-bootstrap-plain colored',
+  React: 'devicon-react-original colored',
+  Vue: 'devicon-vuejs-plain colored',
+  Tailwind: 'devicon-tailwindcss-original colored',
+  Java: 'devicon-java-plain colored',
+  Spring: 'devicon-spring-original colored',
+  Hibernate: 'devicon-hibernate-plain colored',
+  MySQL: 'devicon-mysql-plain colored',
+  Python: 'devicon-python-plain colored',
   Django: 'devicon-django-plain',
-  'Django REST': 'devicon-django-plain',
-  PyTorch: 'devicon-pytorch-original',
-  TensorFlow: 'devicon-tensorflow-original',
-  Laravel: 'devicon-laravel-original',
-  'Node.js': 'devicon-nodejs-plain',
-  Bootstrap: 'devicon-bootstrap-plain',
-  OpenCV: 'devicon-opencv-plain',
-  'Scikit-learn': 'devicon-scikitlearn-plain',
-  Git: 'devicon-git-plain',
-  Docker: 'devicon-docker-plain',
-  MySQL: 'devicon-mysql-plain',
-  PostgreSQL: 'devicon-postgresql-plain',
-  'VS Code': 'devicon-vscode-plain',
-  Linux: 'devicon-linux-plain',
+  MongoDB: 'devicon-mongodb-plain colored',
+  Docker: 'devicon-docker-plain colored',
+  'Node.js': 'devicon-nodejs-plain colored',
+  Git: 'devicon-git-plain colored',
+  'Google Cloud': 'devicon-googlecloud-plain colored',
 };
 
 export default function About() {
@@ -157,52 +143,37 @@ export default function About() {
 
           {/* Skills */}
           {activeTab === 'skills' && (
-            <div className="about__skills" role="tabpanel" id="tabpanel-skills" aria-labelledby="tab-skills">
-              {Object.entries(TECH_ICONS).map(([group, items]) => (
-                <div key={group} className="skill-group">
-                  <h4 className="skill-group__label letter-spaced">{group}</h4>
-                  <div className="skill-group__icons">
-                    {items.map((tech) => (
-                      <div
-                        key={tech}
-                        className="skill-icon"
-                        title={tech}
-                        style={{ '--color': ICON_COLORS[tech] || '#888' }}
-                      >
-                        <div className="skill-icon__box">
-                          {DEVICON_CLASSES[tech] ? (
-                            <i className={`${DEVICON_CLASSES[tech]} colored`} style={{ fontSize: '40px' }}></i>
-                          ) : (
-                            <span className="skill-icon__abbr">
-                              {tech.slice(0, 2).toUpperCase()}
-                            </span>
-                          )}
+            <div className="about__skills-wrapper" role="tabpanel" id="tabpanel-skills" aria-labelledby="tab-skills">
+              <div className="about__skills-columns">
+                {Object.entries(TECH_ICONS).map(([group, items]) => (
+                  <div key={group} className="skill-group">
+                    <h4 className="skill-group__label letter-spaced">{group}</h4>
+                    <div className="skill-group__icons">
+                      {items.map((tech) => (
+                        <div
+                          key={tech}
+                          className="skill-icon"
+                          title={tech}
+                        >
+                          <div className="skill-icon__box">
+                            <i className={DEVICON_CLASSES[tech]}></i>
+                          </div>
                         </div>
-                        <span className="skill-icon__name">{tech}</span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-
-              <div className="about__actions" style={{ marginTop: '32px' }}>
+                ))}
+              </div>
+              <div className="about__skills-divider"></div>
+              <div className="about__skills-actions">
                 <a
                   href="/resume.pdf"
                   target="_blank"
                   rel="noreferrer"
-                  className="about__cv-btn"
+                  className="about__skills-cv"
                   aria-label="Download CV"
                 >
                   DOWNLOAD CV
-                </a>
-                <a
-                  href="https://github.com/fahim06"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="about__cv-btn"
-                  aria-label="View GitHub profile"
-                >
-                  VIEW GITHUB
                 </a>
               </div>
             </div>
