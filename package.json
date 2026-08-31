@@ -20,8 +20,7 @@
     "@vercel/speed-insights": "^2.0.0",
     "nodemailer": "^9.0.6",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "swiper": "^14.2.0"
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",

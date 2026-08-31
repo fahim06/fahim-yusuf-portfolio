@@ -2,23 +2,15 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { projects } from '../data/portfolio';
 import { useIntersection } from '../hooks/useIntersection';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { EffectCoverflow, Pagination } from 'swiper/modules';
-
-import 'swiper/css';
-import 'swiper/css/effect-coverflow';
-import 'swiper/css/pagination';
 import './Projects.css';
 
-/* Wireframe polygon shape — now used as card accent */
+/* Wireframe polygon shape for accents */
 function WireframeShape({ type = 0 }) {
   const shapes = [
     <polygon key="t" points="50,5 95,85 5,85" fill="none" stroke="rgba(200,200,200,0.18)" strokeWidth="0.8" />,
     <polygon key="d" points="50,5 95,50 50,95 5,50" fill="none" stroke="rgba(200,200,200,0.18)" strokeWidth="0.8" />,
     <polygon key="p" points="50,5 95,35 80,85 20,85 5,35" fill="none" stroke="rgba(200,200,200,0.18)" strokeWidth="0.8" />,
     <polygon key="h" points="50,5 90,28 90,72 50,95 10,72 10,28" fill="none" stroke="rgba(200,200,200,0.18)" strokeWidth="0.8" />,
-    <polygon key="s" points="50,2 61,35 96,35 68,57 79,91 50,70 21,91 32,57 4,35 39,35" fill="none" stroke="rgba(200,200,200,0.18)" strokeWidth="0.8" />,
-    <rect key="r" x="10" y="10" width="80" height="80" fill="none" stroke="rgba(200,200,200,0.18)" strokeWidth="0.8" />,
   ];
 
   return (
@@ -32,7 +24,8 @@ export default function Projects() {
   const [activeProject, setActiveProject] = useState(null);
   const [ref, visible] = useIntersection();
 
-  const displayed = (projects || []);
+  // Highlight ML/AI projects if they have the 'stars: 1' flag
+  const displayed = projects || [];
 
   return (
     <section id="projects" className="projects section">
@@ -40,50 +33,30 @@ export default function Projects() {
         ref={ref}
         className={`projects__inner container ${visible ? 'fade-up visible' : 'fade-up'}`}
       >
-        {/* Section header */}
         <div className="projects__header">
           <h2 className="projects__heading">Projects</h2>
-          <p className="projects__sub letter-spaced">Selected works</p>
+          <p className="projects__sub letter-spaced">Selected works & research</p>
         </div>
 
-        {/* Project cards swiper */}
-        <Swiper
-          effect={'coverflow'}
-          grabCursor={true}
-          centeredSlides={true}
-          slidesPerView={'auto'}
-          loop={true}
-          coverflowEffect={{
-            rotate: 50,
-            stretch: 0,
-            depth: 200,
-            modifier: 1.5,
-            slideShadows: true,
-          }}
-          pagination={{ clickable: true }}
-          modules={[EffectCoverflow, Pagination]}
-          className="projects__swiper"
-          style={{ width: '100%', padding: '40px 0 60px 0' }}
-        >
-          {displayed.map((project, i) => (
-            <SwiperSlide key={`${project.name}-${i}`} style={{ width: 'min(90vw, 420px)', height: 'auto', alignSelf: 'stretch' }}>
+        <div className="projects__grid">
+          {displayed.map((project, i) => {
+            const isFeatured = project.stars === 1;
+            return (
               <article
-                className="project-card"
-                role="listitem"
+                key={`${project.name}-${i}`}
+                className={`project-card glass-panel ${isFeatured ? 'project-card--featured' : ''}`}
+                role="button"
                 id={`project-card-${i}`}
                 onClick={() => setActiveProject(project)}
                 onKeyDown={(e) => e.key === 'Enter' && setActiveProject(project)}
                 tabIndex={0}
                 aria-label={`${project.name} — click to view details`}
-                style={{ height: '100%' }}
               >
-                {/* Accent shape top-right */}
                 <div className="project-card__shape" aria-hidden="true">
                   <WireframeShape type={i} />
                 </div>
 
-                {/* Card content */}
-                <div className="project-card__body">
+                <div className="project-card__content">
                   <div className="project-card__meta">
                     <span
                       className="project-card__lang letter-spaced"
@@ -97,10 +70,12 @@ export default function Projects() {
                       </span>
                     )}
                   </div>
+                  
                   <h3 className="project-card__title">{project.name}</h3>
                   <p className="project-card__desc">{project.description}</p>
+                  
                   <div className="project-card__tags">
-                    {(project.tags || []).slice(0, 3).map((t) => (
+                    {(project.tags || []).map((t) => (
                       <span key={t} className="project-card__tag">{t}</span>
                     ))}
                   </div>
@@ -110,9 +85,9 @@ export default function Projects() {
                   View details →
                 </div>
               </article>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+            );
+          })}
+        </div>
       </div>
 
       {/* Project detail modal */}
@@ -125,7 +100,7 @@ export default function Projects() {
           aria-modal="true"
         >
           <div
-            className="project-detail__card"
+            className="project-detail__card glass-panel"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -137,7 +112,6 @@ export default function Projects() {
               ✕
             </button>
 
-            {/* Decorative shape */}
             <div className="project-detail__shape" aria-hidden="true">
               <WireframeShape type={displayed.findIndex(p => p.name === activeProject.name)} />
             </div>
@@ -190,4 +164,3 @@ export default function Projects() {
     </section>
   );
 }
-
