@@ -338,30 +338,7 @@
   justify-content: center;
 }
 
-.about__skills-cv {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(176, 38, 255, 0.4);
-  border-radius: 50px;
-  padding: 14px 40px;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.15em;
-  color: var(--accent);
-  text-transform: uppercase;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  background: transparent;
-}
 
-.about__skills-cv:hover {
-  background: rgba(176, 38, 255, 0.1);
-  border-color: var(--accent);
-  color: var(--text-primary);
-  box-shadow: 0 0 20px rgba(176, 38, 255, 0.2);
-  transform: translateY(-2px);
-}
 
 @media (max-width: 900px) {
   .about__content {

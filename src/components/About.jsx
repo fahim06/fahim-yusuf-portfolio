@@ -28,31 +28,22 @@ function WireframeAvatar() {
 
 /* Skill icon grid */
 const TECH_ICONS = {
-  'FRONT-END': ['HTML', 'CSS', 'JavaScript', 'Three.js', 'jQuery', 'Bootstrap', 'React', 'Vue', 'Tailwind'],
-  'BACK-END': ['Java', 'Spring', 'Hibernate', 'MySQL', 'Python', 'Django', 'MongoDB', 'Docker', 'Node.js', 'Git', 'Google Cloud'],
+  'FRONT-END': ['HTML', 'CSS', 'JavaScript', 'Bootstrap', 'React', 'Tailwind'],
+  'BACK-END': ['Python', 'MySQL', 'Django', 'Docker', 'Git'],
 };
 
 const DEVICON_CLASSES = {
   HTML: 'devicon-html5-plain colored',
   CSS: 'devicon-css3-plain colored',
   JavaScript: 'devicon-javascript-plain colored',
-  'Three.js': 'devicon-threejs-original',
-  jQuery: 'devicon-jquery-plain colored',
   Bootstrap: 'devicon-bootstrap-plain colored',
   React: 'devicon-react-original colored',
-  Vue: 'devicon-vuejs-plain colored',
   Tailwind: 'devicon-tailwindcss-original colored',
-  Java: 'devicon-java-plain colored',
-  Spring: 'devicon-spring-original colored',
-  Hibernate: 'devicon-hibernate-plain colored',
   MySQL: 'devicon-mysql-plain colored',
   Python: 'devicon-python-plain colored',
   Django: 'devicon-django-plain',
-  MongoDB: 'devicon-mongodb-plain colored',
   Docker: 'devicon-docker-plain colored',
-  'Node.js': 'devicon-nodejs-plain colored',
   Git: 'devicon-git-plain colored',
-  'Google Cloud': 'devicon-googlecloud-plain colored',
 };
 
 export default function About() {
@@ -170,7 +161,7 @@ export default function About() {
                   href="/resume.pdf"
                   target="_blank"
                   rel="noreferrer"
-                  className="about__skills-cv"
+                  className="about__cv-btn"
                   aria-label="Download CV"
                 >
                   DOWNLOAD CV
