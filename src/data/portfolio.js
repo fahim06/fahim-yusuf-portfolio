@@ -54,6 +54,31 @@ export const education = [
   },
 ];
 
+export const experience = [
+  {
+    role: "AI/ML Researcher",
+    company: "Jahangirnagar University",
+    period: "2023 – Present",
+    description: "Led research on deep learning architectures for image classification, achieving state-of-the-art results.",
+    highlights: [
+      "Optimized CNN architectures (MobileNet, Inception V3) for constrained edge environments",
+      "Published findings on transfer learning efficiencies",
+    ],
+    color: "#a855f7",
+  },
+  {
+    role: "Software Engineer",
+    company: "Freelance",
+    period: "2021 – Present",
+    description: "Developed and deployed full-stack web applications and AI-integrated solutions for diverse clients.",
+    highlights: [
+      "Architected scalable backends using Django and PostgreSQL",
+      "Designed pixel-perfect, responsive frontends using React and modern CSS",
+    ],
+    color: "#6366f1",
+  }
+];
+
 export const skills = {
   Languages: [
     { name: "Python", level: 95 },
