@@ -1,6 +1,6 @@
 /* ── Hero Section ──────────────────────────────────── */
 .hero {
-  background: var(--bg);
+  background: transparent;
   justify-content: center;
   align-items: center;
 }
@@ -143,12 +143,13 @@
   font-size: clamp(64px, 10vw, 130px);
   /* subtle text glow */
   text-shadow: 0 0 60px rgba(255, 255, 255, 0.08);
-  transition: text-shadow 0.4s ease, color 0.4s ease;
+  -webkit-text-stroke: 2px transparent;
+  transition: text-shadow 0.4s ease, color 0.4s ease, -webkit-text-stroke 0.4s ease;
 }
 
 .hero__name:hover .hero__name-line {
-  text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #fff, 0 0 80px #fff, 0 0 120px #fff, 0 0 160px #fff;
-  color: #fff;
+  -webkit-text-stroke: 2px var(--accent);
+  text-shadow: 0 0 10px var(--accent), 0 0 30px var(--accent), 0 0 50px var(--accent);
 }
 
 /* Space between two lines */
@@ -167,6 +168,7 @@
   font-weight: 700;
   font-size: 1.4em;
   font-family: 'Nanum Myeongjo', serif;
+  transition: color 0.4s ease;
 }
 
 .hero__name-rest {
@@ -175,6 +177,7 @@
   font-weight: 400;
   font-size: 1.1em;
   font-family: 'Nanum Myeongjo', serif;
+  transition: color 0.4s ease;
 }
 
 /* CTA Button */

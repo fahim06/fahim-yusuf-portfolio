@@ -1,6 +1,6 @@
 /* ── Services Section ──────────────────────────────── */
 .services {
-  background: var(--bg);
+  background: transparent;
 }
 
 .services__layout {
@@ -71,9 +71,13 @@
 }
 
 .service-card:hover {
-  border-color: var(--border-hover);
+  border-color: var(--accent);
   background: rgba(255, 255, 255, 0.02);
   transform: translateY(-1px);
+}
+
+.service-card:hover .service-card__title {
+  color: var(--accent);
 }
 
 .service-card__icon {
@@ -100,7 +104,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: var(--bg);
+  background: transparent;
   position: relative;
   overflow: hidden;
 }

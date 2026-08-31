@@ -1,6 +1,6 @@
 /* ── Contact Section ───────────────────────────────── */
 .contact {
-  background: var(--bg);
+  background: transparent;
   justify-content: center;
 }
 
@@ -111,7 +111,7 @@
 }
 
 .contact__submit {
-  background: linear-gradient(145deg, rgba(176,38,255,0.1), rgba(0,0,0,0.5));
+  background: linear-gradient(145deg, rgba(176, 38, 255, 0.1), rgba(0, 0, 0, 0.5));
   border: 1px solid rgba(176, 38, 255, 0.3);
   border-radius: 999px;
   padding: 15px 40px;
@@ -123,18 +123,19 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   align-self: flex-start;
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(176, 38, 255, 0.1),
     inset 1px 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 .contact__submit:hover:not(:disabled) {
   border-color: var(--accent);
-  background: linear-gradient(145deg, rgba(176,38,255,0.2), rgba(176,38,255,0.05));
-  box-shadow: 
+  background: linear-gradient(145deg, rgba(176, 38, 255, 0.2), rgba(176, 38, 255, 0.05));
+  box-shadow:
     0 0 20px rgba(176, 38, 255, 0.3),
     inset 1px 1px 4px rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
+  color: var(--accent);
 }
 
 .contact__submit--loading,
@@ -176,7 +177,7 @@
 }
 
 .contact__retry {
-  background: linear-gradient(145deg, rgba(176,38,255,0.1), rgba(0,0,0,0.5));
+  background: linear-gradient(145deg, rgba(176, 38, 255, 0.1), rgba(0, 0, 0, 0.5));
   border: 1px solid rgba(176, 38, 255, 0.3);
   border-radius: 999px;
   padding: 15px 40px;
@@ -187,7 +188,7 @@
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(176, 38, 255, 0.1),
     inset 1px 1px 2px rgba(255, 255, 255, 0.1);
   margin-top: 8px;
@@ -195,11 +196,12 @@
 
 .contact__retry:hover {
   border-color: var(--accent);
-  background: linear-gradient(145deg, rgba(176,38,255,0.2), rgba(176,38,255,0.05));
-  box-shadow: 
+  background: linear-gradient(145deg, rgba(176, 38, 255, 0.2), rgba(176, 38, 255, 0.05));
+  box-shadow:
     0 0 20px rgba(176, 38, 255, 0.3),
     inset 1px 1px 4px rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
+  color: var(--accent);
 }
 
 .contact__error-link {
@@ -231,7 +233,7 @@
 }
 
 a.contact__info-item:hover {
-  color: var(--text-primary);
+  color: var(--accent);
 }
 
 /* Screen-reader only utility */

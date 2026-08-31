@@ -165,8 +165,6 @@ export default function Hero() {
   return (
     <section id="home" className="hero section">
 
-      <BinaryFloats />
-      <WaveShape />
 
       {/* Glow */}
       <div className="hero__glow" aria-hidden="true" />

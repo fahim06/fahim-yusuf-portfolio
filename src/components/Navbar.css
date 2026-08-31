@@ -38,8 +38,8 @@
 }
 
 .navbar__logo:hover .navbar__logo-text {
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5);
-  color: #fff;
+  text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+  color: var(--accent);
 }
 
 .navbar__logo-text {
@@ -64,7 +64,7 @@
 }
 
 .navbar__hamburger:hover span {
-  box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #fff, 0 0 80px #fff, 0 0 120px #fff, 0 0 160px #ffffff;
+  box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent), 0 0 40px var(--accent);
 }
 
 .navbar__hamburger span {
@@ -155,7 +155,7 @@
 
 .nav-overlay__item:hover .nav-overlay__label {
   color: var(--accent);
-  text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #fff, 0 0 80px #fff, 0 0 120px #fff, 0 0 160px #fff;
+  text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
 }
 
 .nav-overlay__num {
