@@ -126,9 +126,9 @@
 }
 
 .hero__name {
-  font-family: var(--serif);
-  font-weight: 300;
-  letter-spacing: 0.15em;
+  font-family: var(--sans);
+  font-weight: 800;
+  letter-spacing: -0.05em;
   text-transform: uppercase;
   color: var(--text-primary);
   line-height: 1;
@@ -142,12 +142,12 @@
   display: block;
   font-size: clamp(64px, 10vw, 130px);
   /* subtle text glow */
-  text-shadow: 0 0 60px rgba(255, 255, 255, 0.08);
+  text-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
   transition: text-shadow 0.4s ease, color 0.4s ease;
 }
 
 .hero__name:hover .hero__name-line {
-  text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #fff, 0 0 80px #fff, 0 0 120px #fff, 0 0 160px #fff;
+  text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent), 0 0 40px var(--accent-glow), 0 0 80px var(--accent-glow);
   color: #fff;
 }
 
@@ -163,18 +163,18 @@
 
 .hero__name-first {
   color: #ffffff;
-  margin-right: -1.6vw;
-  font-weight: 700;
-  font-size: 1.4em;
-  font-family: 'Nanum Myeongjo', serif;
+  margin-right: -0.2vw;
+  font-weight: 800;
+  font-size: 1.1em;
+  font-family: var(--sans);
 }
 
 .hero__name-rest {
-  color: #a8a8a8;
-  margin-right: 2vw;
-  font-weight: 400;
-  font-size: 1.1em;
-  font-family: 'Nanum Myeongjo', serif;
+  color: var(--text-primary);
+  margin-right: 0vw;
+  font-weight: 600;
+  font-size: 1em;
+  font-family: var(--sans);
 }
 
 /* CTA Button */

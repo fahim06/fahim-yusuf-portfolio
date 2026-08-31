@@ -173,7 +173,7 @@ export default function Hero() {
 
       {/* Content */}
       <div className="hero__content">
-        <p className="hero__eyebrow letter-spaced">| Creative Developer |</p>
+        <p className="hero__eyebrow letter-spaced">| Software Engineer & AI Researcher |</p>
 
         <h1 className="hero__name">
           <span className="hero__name-line">
