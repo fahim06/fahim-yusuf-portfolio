@@ -47,6 +47,33 @@ const ICON_COLORS = {
   PostgreSQL: '#336791', 'VS Code': '#007ACC', Linux: '#333333',
 };
 
+const DEVICON_CLASSES = {
+  Python: 'devicon-python-plain',
+  JavaScript: 'devicon-javascript-plain',
+  Java: 'devicon-java-plain',
+  PHP: 'devicon-php-plain',
+  C: 'devicon-c-plain',
+  SQL: 'devicon-azuresqldatabase-plain',
+  HTML: 'devicon-html5-plain',
+  CSS: 'devicon-css3-plain',
+  React: 'devicon-react-original',
+  Django: 'devicon-django-plain',
+  'Django REST': 'devicon-django-plain',
+  PyTorch: 'devicon-pytorch-original',
+  TensorFlow: 'devicon-tensorflow-original',
+  Laravel: 'devicon-laravel-original',
+  'Node.js': 'devicon-nodejs-plain',
+  Bootstrap: 'devicon-bootstrap-plain',
+  OpenCV: 'devicon-opencv-plain',
+  'Scikit-learn': 'devicon-scikitlearn-plain',
+  Git: 'devicon-git-plain',
+  Docker: 'devicon-docker-plain',
+  MySQL: 'devicon-mysql-plain',
+  PostgreSQL: 'devicon-postgresql-plain',
+  'VS Code': 'devicon-vscode-plain',
+  Linux: 'devicon-linux-plain',
+};
+
 export default function About() {
   const [activeTab, setActiveTab] = useState('education');
   const [ref, visible] = useIntersection();
@@ -136,10 +163,14 @@ export default function About() {
                         title={tech}
                         style={{ '--color': ICON_COLORS[tech] || '#888' }}
                       >
-                        <div className="skill-icon__circle">
-                          <span className="skill-icon__abbr">
-                            {tech.slice(0, 2).toUpperCase()}
-                          </span>
+                        <div className="skill-icon__box">
+                          {DEVICON_CLASSES[tech] ? (
+                            <i className={`${DEVICON_CLASSES[tech]} colored`} style={{ fontSize: '40px' }}></i>
+                          ) : (
+                            <span className="skill-icon__abbr">
+                              {tech.slice(0, 2).toUpperCase()}
+                            </span>
+                          )}
                         </div>
                         <span className="skill-icon__name">{tech}</span>
                       </div>
