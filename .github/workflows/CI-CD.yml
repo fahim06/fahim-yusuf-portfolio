@@ -510,15 +510,26 @@ jobs:
 
       - name: Deploy to Vercel Preview
         id: vercel-preview
-        uses: amondnet/vercel-action@v25
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          github-comment: ${{ github.event_name == 'pull_request' }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          PREVIEW_URL="$(vercel deploy --yes --target=preview \
+            --token="$VERCEL_TOKEN" \
+            --scope="$VERCEL_ORG_ID" \
+            --project="$VERCEL_PROJECT_ID" \
+            2>&1 | tee /tmp/vercel-deploy.log |
+            grep -Eo 'https://[^[:space:]]+\.vercel\.app' | tail -n 1 || true)"
+
+          if [[ -z "$PREVIEW_URL" ]]; then
+            echo "::error::Vercel preview deployment did not return a deployment URL."
+            cat /tmp/vercel-deploy.log
+            exit 1
+          fi
+
+          echo "preview-url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
 
       - name: Record preview deployment
         env:
