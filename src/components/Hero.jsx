@@ -164,16 +164,17 @@ export default function Hero() {
 
   return (
     <section id="home" className="hero section">
-      <ParticleCanvas />
-      <BinaryFloats />
-      <WaveShape />
+
 
       {/* Glow */}
       <div className="hero__glow" aria-hidden="true" />
 
       {/* Content */}
       <div className="hero__content">
-        <p className="hero__eyebrow letter-spaced">| Creative Developer |</p>
+        <p className="hero__eyebrow letter-spaced">
+          AI & MACHINE LEARNING ENGINEER<br />
+          BUILDING INTELLIGENT SOFTWARE SYSTEMS
+        </p>
 
         <h1 className="hero__name">
           <span className="hero__name-line">

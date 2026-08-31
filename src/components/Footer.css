@@ -1,6 +1,6 @@
 /* ── Footer ────────────────────────────────────────── */
 .footer {
-  background: var(--bg);
+  background: transparent;
   border-top: 1px solid var(--border);
   padding: 48px 0;
 }
@@ -29,8 +29,8 @@
 }
 
 .footer__logo:hover {
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5);
-  color: #fff;
+  text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+  color: var(--accent);
 }
 
 .footer__tagline {
@@ -58,7 +58,7 @@
 }
 
 .footer__nav-link:hover {
-  color: var(--text-primary);
+  color: var(--accent);
 }
 
 /* Social Links */
@@ -115,7 +115,7 @@
 }
 
 .footer__legal-link:hover {
-  color: var(--text-secondary);
+  color: var(--accent);
 }
 
 /* ── Legal Modals ─────────────────────────────────── */
@@ -157,7 +157,7 @@
 }
 
 .footer-modal__close:hover {
-  color: var(--text-primary);
+  color: var(--accent);
 }
 
 .footer-modal__title {
