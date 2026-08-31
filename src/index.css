@@ -86,8 +86,8 @@ img {
   --text-secondary: #a0a0a0;
   --text-muted: #888888;
   /* was #555 — lightened for WCAG AA contrast */
-  --accent: #4ecca3;
-  /* teal green – reference site uses green for buttons */
+  --accent: #b026ff;
+  /* neon violet/purple for cinematic AI feel */
   --accent-2: #ffffff;
   --serif: 'Cormorant Garamond', Georgia, serif;
   --sans: 'Space Grotesk', sans-serif;
