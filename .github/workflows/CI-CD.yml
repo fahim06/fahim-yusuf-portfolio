@@ -1,33 +1,28 @@
-name: Unified CI/CD Pipeline
+name: 🚀 Portfolio CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
   pull_request:
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
   schedule:
     - cron: '0 3 * * 1'
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target deployment environment'
+        description: Target deployment environment
         required: true
-        default: 'production'
+        default: production
         type: choice
         options:
           - production
           - preview
 
-# Least-privilege default. Individual jobs elevate only what they need.
 permissions:
   contents: read
 
 concurrency:
-  group: ci-cd-${{ github.workflow }}-${{ github.ref }}
+  group: portfolio-cicd-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -35,20 +30,42 @@ env:
   PROD_URL: 'https://fahimyusuf.com.bd/'
 
 jobs:
-  # ── 1. Branching strategy ─────────────────────────────────────────────────────
-  enforce-branching:
-    name: Enforce Branching Strategy
-    if: >
-      (github.event_name == 'pull_request' && github.base_ref == 'main') ||
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # ① CODE QUALITY & SECURITY
+  # GitHub renders this as a compact matrix group with five checks.
+  # ═══════════════════════════════════════════════════════════════════════════════
+  quality-security:
+    name: ① Quality & Security • ${{ matrix.label }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write
+      issues: write
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: branching
+            label: Branching Strategy
+          - id: pr
+            label: PR Classification & Size
+          - id: sast
+            label: CodeQL & Secret Scanner
+          - id: dependencies
+            label: Dependency Vulnerability
+          - id: lint
+            label: Lint & Audit
+
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: ${{ matrix.id == 'sast' && 0 || 1 }}
+
+      # ── Branching strategy ────────────────────────────────────────────────────
       - name: Validate PR source branch
-        if: github.event_name == 'pull_request'
+        if: matrix.id == 'branching' && github.event_name == 'pull_request' && github.base_ref == 'main'
         env:
           HEAD_BRANCH: ${{ github.head_ref }}
         run: |
@@ -58,10 +75,14 @@ jobs:
             echo "Detected source branch: $HEAD_BRANCH"
             exit 1
           fi
-          echo "Branching strategy passed: dev -> main."
+          echo "✅ Branching strategy passed: dev → main"
 
       - name: Validate main commit came through dev PR
-        if: github.event_name != 'pull_request'
+        if: >
+          matrix.id == 'branching' &&
+          github.event_name != 'pull_request' &&
+          github.ref == 'refs/heads/main' &&
+          (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         uses: actions/github-script@v9
         with:
           script: |
@@ -76,41 +97,37 @@ jobs:
               }
             );
 
-            const valid = prs.find(
-              pr =>
-                pr.state === 'closed' &&
-                pr.merged_at &&
-                pr.base.ref === 'main' &&
-                pr.head.ref === 'dev'
+            const valid = prs.find(pr =>
+              pr.state === 'closed' &&
+              pr.merged_at &&
+              pr.base.ref === 'main' &&
+              pr.head.ref === 'dev'
             );
 
             if (!valid) {
               core.setFailed(
-                `Commit ${sha} is not associated with a merged dev -> main pull request. Direct commits to main are blocked by this workflow.`
+                `Commit ${sha} is not associated with a merged dev → main PR. Direct commits to main are blocked.`
               );
               return;
             }
 
-            core.notice(
-              `Branching strategy passed: ${valid.head.ref} -> ${valid.base.ref} via PR #${valid.number}.`
-            );
+            core.notice(`✅ Branching strategy passed via PR #${valid.number}: dev → main`);
 
-  # ── 2. PR classification + size ──────────────────────────────────────────────
-  # On PRs: classify the open PR.
-  # On main: classify the merged dev -> main PR associated with the commit.
-  pr-automation:
-    name: PR Classification & Size
-    if: >
-      github.event_name == 'pull_request' ||
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: write
-    steps:
+      - name: Branching check not applicable
+        if: >
+          matrix.id == 'branching' &&
+          !(
+            (github.event_name == 'pull_request' && github.base_ref == 'main') ||
+            (github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch'))
+          )
+        run: echo "ℹ️ Branching enforcement is only required for PRs into main and main releases."
+
+      # ── PR classification + size ──────────────────────────────────────────────
       - name: Classify PR and calculate size
+        if: >
+          matrix.id == 'pr' &&
+          (github.event_name == 'pull_request' ||
+           (github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')))
         uses: actions/github-script@v9
         with:
           script: |
@@ -153,22 +170,17 @@ jobs:
                 }
               );
 
-              pr = prs.find(
-                item =>
-                  item.state === 'closed' &&
-                  item.merged_at &&
-                  item.base.ref === 'main' &&
-                  item.head.ref === 'dev'
+              pr = prs.find(item =>
+                item.state === 'closed' &&
+                item.merged_at &&
+                item.base.ref === 'main' &&
+                item.head.ref === 'dev'
               );
 
               if (!pr) {
-                core.setFailed(
-                  `No merged dev -> main PR is associated with commit ${context.sha}.`
-                );
+                core.setFailed(`No merged dev → main PR is associated with commit ${context.sha}.`);
                 return;
               }
-
-              core.notice(`Classifying merged PR #${pr.number} (${pr.title}).`);
             }
 
             const files = await github.paginate(github.rest.pulls.listFiles, {
@@ -189,8 +201,10 @@ jobs:
             else if (totalChanges > 80) size = 'm';
             else if (totalChanges > 20) size = 's';
 
-            const title = pr.title.trim();
-            const conventional = title.match(/^(feat|fix|refactor|docs|test|chore|perf|ci|build|style)(\([^)]+\))?!?:/i);
+            const conventional = pr.title.trim().match(
+              /^(feat|fix|refactor|docs|test|chore|perf|ci|build|style)(\([^)]+\))?!?:/i
+            );
+
             const typeMap = {
               feat: 'type/feat',
               fix: 'type/fix',
@@ -230,11 +244,11 @@ jobs:
                 labels: [`size/${size}`, typeLabel]
               });
             } catch (error) {
-              core.warning(`Classification succeeded, but labels could not be updated: ${error.message}`);
+              core.warning(`Classification completed, but labels could not be updated: ${error.message}`);
             }
 
             await core.summary
-              .addHeading('PR Classification')
+              .addHeading('🏷️ PR Classification')
               .addTable([
                 [{data: 'Metric', header: true}, {data: 'Result', header: true}],
                 ['PR', `#${pr.number}`],
@@ -245,115 +259,101 @@ jobs:
               ])
               .write();
 
-  # ── 3. CodeQL + secrets ──────────────────────────────────────────────────────
-  security-sast:
-    name: CodeQL & Secret Scanning
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-    steps:
-      - name: Checkout full history
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
+      - name: PR classification not applicable
+        if: >
+          matrix.id == 'pr' &&
+          !(github.event_name == 'pull_request' ||
+            (github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')))
+        run: echo "ℹ️ PR classification is not applicable to this event."
 
+      # ── CodeQL + secret scanner ────────────────────────────────────────────────
       - name: Initialize CodeQL
+        if: matrix.id == 'sast'
         uses: github/codeql-action/init@v4
         with:
           languages: javascript-typescript
           queries: security-extended,security-and-quality
 
       - name: Analyze with CodeQL
+        if: matrix.id == 'sast'
         uses: github/codeql-action/analyze@v4
         with:
-          category: "/language:javascript-typescript"
+          category: /language:javascript-typescript
 
-      - name: Run Gitleaks
+      - name: Run Gitleaks secret scanner
+        if: matrix.id == 'sast'
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # ── 4. Dependency vulnerabilities ─────────────────────────────────────────────
-  # Dependency-review is PR-native. Main is protected independently with a
-  # blocking lockfile-aware npm audit so the same security gate exists on main.
-  dependency-vulnerability:
-    name: Dependency Vulnerability Gate
-    if: >
-      github.event_name == 'pull_request' ||
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
-      github.event_name == 'schedule'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-
-      - name: Setup Node.js
+      # ── Dependency vulnerability ───────────────────────────────────────────────
+      - name: Setup Node.js for dependency checks
+        if: matrix.id == 'dependencies'
         uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Install exact lockfile dependencies
+      - name: Install exact dependencies
+        if: matrix.id == 'dependencies'
         run: npm ci
 
-      - name: Review dependency changes on PR
-        if: github.event_name == 'pull_request'
+      - name: Review dependency changes
+        if: matrix.id == 'dependencies' && github.event_name == 'pull_request'
         uses: actions/dependency-review-action@v5
         with:
           fail-on-severity: high
           comment-summary-in-pr: false
           show-patched-versions: true
 
-      - name: Full dependency audit on main
-        if: github.event_name != 'pull_request'
+      - name: Audit all dependencies
+        if: matrix.id == 'dependencies' && github.event_name != 'pull_request'
         run: npm audit --audit-level=high
 
-      - name: Production dependency audit
+      - name: Audit production dependencies
+        if: matrix.id == 'dependencies'
         run: npm audit --omit=dev --audit-level=high
 
-  # ── 5. Lint + audit ──────────────────────────────────────────────────────────
-  lint-and-audit:
-    name: Lint & Audit
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-
-      - name: Setup Node.js
+      # ── Lint & audit ───────────────────────────────────────────────────────────
+      - name: Setup Node.js for lint
+        if: matrix.id == 'lint'
         uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Install dependencies
+      - name: Install dependencies for lint
+        if: matrix.id == 'lint'
         run: npm ci
 
       - name: Run lint
+        if: matrix.id == 'lint'
         run: npm run lint
 
       - name: Run blocking npm audit
+        if: matrix.id == 'lint'
         run: npm audit --audit-level=high
 
-  # ── 6. Build validation ───────────────────────────────────────────────────────
-  build:
-    name: Build & Bundle Validation (Node ${{ matrix.node-version }})
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # ② BUILD & VALIDATE
+  # Matrix is intentionally used so GitHub groups Node 22/24 into one stage card.
+  # Node 24 additionally performs SEO/static validation and publishes artifacts.
+  # ═══════════════════════════════════════════════════════════════════════════════
+  build-validate:
+    name: ② Build & Validate • Node ${{ matrix.node-version }}
+    needs: quality-security
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      actions: read
     strategy:
       fail-fast: false
       matrix:
         node-version: [22, 24]
-    permissions:
-      contents: read
-      pages: write
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v7
 
       - name: Setup Node.js ${{ matrix.node-version }}
@@ -371,9 +371,84 @@ jobs:
       - name: Verify build output
         run: |
           set -euo pipefail
-          test -f dist/index.html
           test -s dist/index.html
-          echo "Production build is present and non-empty."
+          echo "✅ Production bundle exists and is non-empty."
+
+      - name: Validate SEO metadata and static files
+        if: matrix.node-version == 24
+        env:
+          TARGET_URL: ${{ env.PROD_URL }}
+        run: |
+          set -euo pipefail
+
+          test -s dist/index.html
+          test -s dist/robots.txt
+          test -s dist/sitemap.xml
+
+          grep -Fq "$TARGET_URL" dist/sitemap.xml
+          grep -Fq "Sitemap: ${TARGET_URL}sitemap.xml" dist/robots.txt
+
+          python3 <<'PY'
+          import re
+          from pathlib import Path
+          from html.parser import HTMLParser
+          from urllib.parse import urlparse, unquote
+
+          root = Path('dist')
+          html = (root / 'index.html').read_text(encoding='utf-8', errors='ignore')
+
+          assert re.search(r'<title>\s*[^<]+\s*</title>', html, re.I), 'Missing non-empty <title>.'
+
+          desc = re.search(
+              r'<meta\b[^>]*\bname=["\']description["\'][^>]*\bcontent=["\'][^"\']+["\']',
+              html,
+              re.I,
+          )
+          desc = desc or re.search(
+              r'<meta\b[^>]*\bcontent=["\'][^"\']+["\'][^>]*\bname=["\']description["\']',
+              html,
+              re.I,
+          )
+          assert desc, 'Missing non-empty meta description.'
+
+          class AssetParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.refs = []
+
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if tag in {'script', 'img', 'source', 'video', 'audio', 'iframe'}:
+                      value = attrs.get('src')
+                  elif tag == 'link':
+                      value = attrs.get('href')
+                  else:
+                      value = None
+                  if value:
+                      self.refs.append(value)
+
+          parser = AssetParser()
+          parser.feed(html)
+
+          missing = []
+          for ref in sorted(set(parser.refs)):
+              parsed = urlparse(ref)
+              if parsed.scheme in {'http', 'https', 'mailto', 'tel'}:
+                  continue
+              path = unquote(parsed.path)
+              if not path or path.startswith('#') or path.endswith('/'):
+                  continue
+              candidate = (root / path.lstrip('/')).resolve()
+              if not candidate.is_file():
+                  missing.append(ref)
+
+          if missing:
+              print('Missing local assets:')
+              print('\n'.join(missing))
+              raise SystemExit(1)
+
+          print(f'✅ SEO metadata and {len(set(parser.refs))} asset references validated.')
+          PY
 
       - name: Upload production artifact
         if: matrix.node-version == 24
@@ -390,102 +465,79 @@ jobs:
         with:
           path: dist/
 
-  # ── 7. SEO + static asset integrity ───────────────────────────────────────────
-  seo-and-links:
-    name: SEO & Static Asset Validation
-    needs: build
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # ③ DEPLOYMENTS
+  # Three parallel deployment cards after all quality/build gates pass.
+  # ═══════════════════════════════════════════════════════════════════════════════
+  deploy-production:
+    name: ③ Deployments • Production (Vercel)
+    needs: build-validate
+    if: >
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' ||
+       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'))
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ env.PROD_URL }}
     permissions:
       contents: read
-      actions: read
-    steps:
-      - name: Download production artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: production-dist
-          path: dist
+      deployments: write
 
-      - name: Validate SEO files and metadata
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Require Vercel credentials
         env:
-          TARGET_URL: https://fahimyusuf.com.bd/
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           set -euo pipefail
+          test -n "$VERCEL_TOKEN" || { echo "::error::Missing VERCEL_TOKEN secret."; exit 1; }
+          test -n "$VERCEL_PROJECT_ID" || { echo "::error::Missing VERCEL_PROJECT_ID secret."; exit 1; }
 
-          test -s dist/index.html
-          test -s dist/robots.txt
-          test -s dist/sitemap.xml
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-          grep -Fq "$TARGET_URL" dist/sitemap.xml
-          grep -Fq "Sitemap: ${TARGET_URL}sitemap.xml" dist/robots.txt
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
 
-          python3 <<'PY'
-          import re
-          from pathlib import Path
-
-          html = Path("dist/index.html").read_text(encoding="utf-8", errors="ignore")
-          assert re.search(r"<title>\s*[^<]+\s*</title>", html, re.I), "Missing non-empty <title>."
-          desc = re.search(r"<meta\b[^>]*\bname=[\"']description[\"'][^>]*\bcontent=[\"'][^\"']+[\"']", html, re.I)
-          desc = desc or re.search(r"<meta\b[^>]*\bcontent=[\"'][^\"']+[\"'][^>]*\bname=[\"']description[\"']", html, re.I)
-          assert desc, "Missing non-empty meta description."
-          PY
-
-          echo "SEO metadata, robots.txt, and sitemap.xml passed."
-
-      - name: Validate local static asset references
+      - name: Authenticate Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          python3 <<'PY'
-          from pathlib import Path
-          from html.parser import HTMLParser
-          from urllib.parse import urlparse, unquote
+          set -euo pipefail
+          vercel whoami --token="$VERCEL_TOKEN"
 
-          root = Path("dist")
-          html = (root / "index.html").read_text(encoding="utf-8", errors="ignore")
+      - name: Link Vercel project
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          rm -rf .vercel
+          vercel link --yes --project="$VERCEL_PROJECT_ID" --token="$VERCEL_TOKEN"
 
-          class AssetParser(HTMLParser):
-              def __init__(self):
-                  super().__init__()
-                  self.refs = []
-              def handle_starttag(self, tag, attrs):
-                  attrs = dict(attrs)
-                  if tag in {"script", "img", "source", "video", "audio", "iframe"}:
-                      value = attrs.get("src")
-                  elif tag == "link":
-                      value = attrs.get("href")
-                  else:
-                      value = None
-                  if value:
-                      self.refs.append(value)
+      - name: Deploy production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prod --yes --token="$VERCEL_TOKEN"
 
-          parser = AssetParser()
-          parser.feed(html)
+      - name: Production deployment summary
+        run: |
+          {
+            echo "## 🚀 Production Deployment"
+            echo
+            echo "✅ Vercel production deployment completed."
+            echo "🌐 ${PROD_URL}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
-          missing = []
-          for ref in sorted(set(parser.refs)):
-              parsed = urlparse(ref)
-              if parsed.scheme in {"http", "https", "mailto", "tel"}:
-                  continue
-              path = unquote(parsed.path)
-              if not path or path.startswith("#") or path.endswith("/"):
-                  continue
-              candidate = (root / path.lstrip("/")).resolve()
-              if not candidate.is_file():
-                  missing.append(ref)
-
-          if missing:
-              print("Missing local assets:")
-              print("\n".join(missing))
-              raise SystemExit(1)
-
-          print(f"Checked {len(set(parser.refs))} HTML asset references; no missing local assets found.")
-          PY
-
-  # ── 8. Vercel preview deployment ─────────────────────────────────────────────
-  # PRs get a Vercel preview. Main also gets a preview when explicitly requested.
-  # Authentication is verified before any project operation so credential failures
-  # are surfaced instead of being misreported as a missing deployment URL.
   deploy-preview:
-    name: Deploy Vercel Preview
-    needs: [build, seo-and-links]
+    name: ③ Deployments • Vercel Preview
+    needs: build-validate
     if: >
       (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) ||
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
@@ -497,11 +549,10 @@ jobs:
       contents: read
       pull-requests: write
       deployments: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 1
 
       - name: Require Vercel credentials
         env:
@@ -509,10 +560,10 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           set -euo pipefail
-          test -n "$VERCEL_TOKEN" || { echo "::error::Missing VERCEL_TOKEN GitHub secret."; exit 1; }
-          test -n "$VERCEL_PROJECT_ID" || { echo "::error::Missing VERCEL_PROJECT_ID GitHub secret."; exit 1; }
+          test -n "$VERCEL_TOKEN" || { echo "::error::Missing VERCEL_TOKEN secret."; exit 1; }
+          test -n "$VERCEL_PROJECT_ID" || { echo "::error::Missing VERCEL_PROJECT_ID secret."; exit 1; }
 
-      - name: Setup Node.js for Vercel CLI
+      - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -520,18 +571,10 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      - name: Verify Vercel authentication
+      - name: Authenticate Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          set -euo pipefail
-          if ! VERCEL_WHOAMI_OUTPUT="$(vercel whoami --token="$VERCEL_TOKEN" 2>&1)"; then
-            echo "::error::Vercel authentication failed. The VERCEL_TOKEN cannot be resolved to a Vercel account."
-            printf '%s\n' "$VERCEL_WHOAMI_OUTPUT"
-            echo "::error::Create a new full-account Vercel access token and replace the GitHub VERCEL_TOKEN secret."
-            exit 1
-          fi
-          echo "Authenticated Vercel account: ${VERCEL_WHOAMI_OUTPUT}"
+        run: vercel whoami --token="$VERCEL_TOKEN"
 
       - name: Link Vercel project
         env:
@@ -540,153 +583,72 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf .vercel
-          vercel link \
-            --yes \
-            --project="$VERCEL_PROJECT_ID" \
-            --token="$VERCEL_TOKEN"
+          vercel link --yes --project="$VERCEL_PROJECT_ID" --token="$VERCEL_TOKEN"
 
-      - name: Deploy to Vercel Preview
-        id: vercel-preview
+      - name: Deploy preview
+        id: preview
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           set -euo pipefail
-
-          echo "Starting Vercel preview deployment..."
-          set +e
           DEPLOY_OUTPUT="$(vercel deploy --yes --token="$VERCEL_TOKEN" 2>&1)"
-          DEPLOY_EXIT=$?
-          set -e
-
           printf '%s\n' "$DEPLOY_OUTPUT"
 
-          if [[ "$DEPLOY_EXIT" -ne 0 ]]; then
-            echo "::error::Vercel preview deployment failed with exit code $DEPLOY_EXIT."
-            exit "$DEPLOY_EXIT"
-          fi
-
           PREVIEW_URL="$(printf '%s\n' "$DEPLOY_OUTPUT" | grep -Eo 'https://[^[:space:]]+\.vercel\.app' | tail -n 1 || true)"
-
           if [[ -z "$PREVIEW_URL" ]]; then
-            echo "::error::Vercel deployment completed but no preview URL was detected."
+            echo "::error::Preview deployment completed but no Vercel URL was detected."
             exit 1
           fi
 
           echo "preview-url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
-          echo "Vercel Preview URL: $PREVIEW_URL"
+          echo "✅ Preview: $PREVIEW_URL"
 
-      - name: Record preview deployment
+      - name: Preview deployment summary
         env:
-          PREVIEW_URL: ${{ steps.vercel-preview.outputs.preview-url }}
+          PREVIEW_URL: ${{ steps.preview.outputs.preview-url }}
         run: |
           {
-            echo "## Vercel Preview"
+            echo "## 🌐 Vercel Preview"
             echo
-            echo "Preview deployment completed."
-            echo "URL: ${PREVIEW_URL}"
+            echo "✅ Preview deployment completed."
+            echo "🔗 ${PREVIEW_URL}"
           } >> "$GITHUB_STEP_SUMMARY"
 
-  # ── 9. Vercel production deployment ───────────────────────────────────────────
-  deploy-production:
-    name: Deploy to Production (Vercel)
-    needs:
-      - enforce-branching
-      - pr-automation
-      - security-sast
-      - dependency-vulnerability
-      - lint-and-audit
-      - build
-      - seo-and-links
+  deploy-pages:
+    name: ③ Deployments • GitHub Pages
+    needs: build-validate
     if: >
       github.ref == 'refs/heads/main' &&
-      (
-        github.event_name == 'push' ||
-        (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
-      )
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     environment:
-      name: production
-      url: ${{ env.PROD_URL }}
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
+      pages: write
+      id-token: write
       contents: read
-      deployments: write
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 1
+      - name: Deploy validated artifact to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
-      - name: Require Vercel credentials
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          set -euo pipefail
-          test -n "$VERCEL_TOKEN" || { echo "::error::Missing VERCEL_TOKEN GitHub secret."; exit 1; }
-          test -n "$VERCEL_PROJECT_ID" || { echo "::error::Missing VERCEL_PROJECT_ID GitHub secret."; exit 1; }
-
-      - name: Setup Node.js for Vercel CLI
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-
-      - name: Verify Vercel authentication
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          set -euo pipefail
-          if ! VERCEL_WHOAMI_OUTPUT="$(vercel whoami --token="$VERCEL_TOKEN" 2>&1)"; then
-            echo "::error::Vercel authentication failed. The VERCEL_TOKEN cannot be resolved to a Vercel account."
-            printf '%s\n' "$VERCEL_WHOAMI_OUTPUT"
-            echo "::error::Create a new full-account Vercel access token and replace the GitHub VERCEL_TOKEN secret."
-            exit 1
-          fi
-          echo "Authenticated Vercel account: ${VERCEL_WHOAMI_OUTPUT}"
-
-      - name: Link Vercel project
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          set -euo pipefail
-          rm -rf .vercel
-          vercel link \
-            --yes \
-            --project="$VERCEL_PROJECT_ID" \
-            --token="$VERCEL_TOKEN"
-
-      - name: Deploy production to Vercel
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          set -euo pipefail
-          vercel deploy --prod --yes --token="$VERCEL_TOKEN"
-
-      - name: Record production deployment
-        run: |
-          {
-            echo "## Production Deployment"
-            echo
-            echo "Vercel production deployment completed."
-            echo "URL: ${PROD_URL}"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-  # ── 10. Production health + SSL smoke tests ───────────────────────────────────
-  smoke-test:
-    name: Production Health & SSL Smoke Tests
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # ④ POST-DEPLOYMENT CHECKS
+  # Split into two cards to mirror the reference layout.
+  # ═══════════════════════════════════════════════════════════════════════════════
+  production-health:
+    name: ④ Post-Deployment • Production Health
     needs: deploy-production
     if: >
       github.ref == 'refs/heads/main' &&
-      (
-        github.event_name == 'push' ||
-        (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
-      )
+      (github.event_name == 'push' ||
+       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
     steps:
       - name: Health check with retries
         env:
@@ -698,10 +660,10 @@ jobs:
             status="$(curl -L -sS -o /tmp/prod.html -w '%{http_code}' \
               --connect-timeout 10 --max-time 30 "$URL" || true)"
 
-            echo "Attempt $attempt/12 -> HTTP $status"
+            echo "Attempt $attempt/12 → HTTP $status"
 
             if [[ "$status" =~ ^2[0-9][0-9]$ ]]; then
-              echo "Production health check passed."
+              echo "✅ Production health check passed."
               exit 0
             fi
 
@@ -711,7 +673,28 @@ jobs:
           echo "::error::Production health check failed after 12 attempts."
           exit 1
 
-      - name: Verify HTTPS certificate and expiry
+      - name: Verify canonical production endpoints
+        env:
+          URL: ${{ env.PROD_URL }}
+        run: |
+          set -euo pipefail
+          curl -fsSL --connect-timeout 10 --max-time 30 "${URL}robots.txt" >/dev/null
+          curl -fsSL --connect-timeout 10 --max-time 30 "${URL}sitemap.xml" >/dev/null
+          echo "✅ robots.txt and sitemap.xml are reachable."
+
+  ssl-smoke:
+    name: ④ Post-Deployment • SSL/TLS Smoke Test
+    needs: deploy-production
+    if: >
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' ||
+       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Verify HTTPS certificate
         env:
           HOST: fahimyusuf.com.bd
         run: |
@@ -721,60 +704,23 @@ jobs:
             -connect "${HOST}:443" \
             -servername "${HOST}" \
             -verify_return_error \
-            2>/tmp/openssl-error.log |
+            2>/tmp/openssl-error.log | \
             openssl x509 -noout -issuer -subject -dates
 
-          echo "Checking that the certificate remains valid for at least 7 days..."
           echo | openssl s_client \
             -connect "${HOST}:443" \
             -servername "${HOST}" \
-            -verify_return_error 2>/dev/null |
+            -verify_return_error 2>/dev/null | \
             openssl x509 -checkend 604800 -noout
 
-          echo "TLS certificate is valid and has at least 7 days remaining."
+          echo "✅ TLS certificate is valid for at least 7 more days."
 
-      - name: Verify HTTPS response headers and canonical endpoints
+      - name: Verify HTTPS response
         env:
           URL: ${{ env.PROD_URL }}
         run: |
           set -euo pipefail
-
           headers="$(curl -L -sS -D - -o /dev/null --connect-timeout 10 --max-time 30 "$URL")"
           printf '%s\n' "$headers"
-
           grep -Eiq '^HTTP/[0-9.]+ 2[0-9][0-9]' <<< "$headers"
-
-          curl -fsSL --connect-timeout 10 --max-time 30 "${URL}robots.txt" >/dev/null
-          curl -fsSL --connect-timeout 10 --max-time 30 "${URL}sitemap.xml" >/dev/null
-
-          echo "HTTPS headers and robots/sitemap endpoints passed."
-
-  # ── 11. GitHub Pages deployment ───────────────────────────────────────────────
-  deploy-pages:
-    name: Deploy to GitHub Pages
-    needs:
-      - enforce-branching
-      - pr-automation
-      - security-sast
-      - dependency-vulnerability
-      - lint-and-audit
-      - build
-      - seo-and-links
-    if: >
-      github.ref == 'refs/heads/main' &&
-      (
-        github.event_name == 'push' ||
-        github.event_name == 'workflow_dispatch'
-      )
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      pages: write
-      id-token: write
-      contents: read
-    steps:
-      - name: Deploy validated artifact to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          echo "✅ HTTPS smoke test passed."
