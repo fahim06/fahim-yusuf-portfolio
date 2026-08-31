@@ -113,7 +113,7 @@
 .contact__submit {
   background: linear-gradient(145deg, rgba(176,38,255,0.1), rgba(0,0,0,0.5));
   border: 1px solid rgba(176, 38, 255, 0.3);
-  border-radius: 12px;
+  border-radius: 999px;
   padding: 15px 40px;
   font-family: var(--mono);
   font-size: 12px;
@@ -178,7 +178,7 @@
 .contact__retry {
   background: linear-gradient(145deg, rgba(176,38,255,0.1), rgba(0,0,0,0.5));
   border: 1px solid rgba(176, 38, 255, 0.3);
-  border-radius: 12px;
+  border-radius: 999px;
   padding: 15px 40px;
   font-family: var(--mono);
   font-size: 12px;
