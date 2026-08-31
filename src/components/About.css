@@ -342,13 +342,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #2e7d32;
+  border: 1px solid rgba(176, 38, 255, 0.4);
   border-radius: 50px;
   padding: 14px 40px;
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 0.15em;
-  color: #4a9f5d;
+  color: var(--accent);
   text-transform: uppercase;
   transition: all 0.3s ease;
   text-decoration: none;
@@ -356,9 +356,10 @@
 }
 
 .about__skills-cv:hover {
-  background: rgba(46, 125, 50, 0.05);
-  border-color: #4a9f5d;
-  color: #66bb6a;
+  background: rgba(176, 38, 255, 0.1);
+  border-color: var(--accent);
+  color: var(--text-primary);
+  box-shadow: 0 0 20px rgba(176, 38, 255, 0.2);
   transform: translateY(-2px);
 }
 
